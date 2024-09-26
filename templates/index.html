@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/css/uikit.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/js/uikit-icons.min.js"></script>
+    <title>Triangulation Network</title>
+    <!--<link rel="stylesheet" href="/static/dashboard.css">-->
+    <script src="/static/dashboard.js"></script>
+</head>
+
+<body>
+    <div class="uk-grid uk-height-1-1 uk-width-1-1" uk-grid>
+        <div class="uk-width-1-2 left">
+            <div class="image-container uk-text-center">
+                <img id="dynamic-image" src="/static/images/image.png" alt="Dynamic Image">
+            </div>
+        </div>
+
+        <div class="uk-width-1-2">
+            <div class="edit-form-container top-right uk-text-center">
+                <button onclick="toggleForm('form1')">Open Form 1</button>
+                <button onclick="toggleForm('form2')">Open Form 2</button>
+
+                <form id="form1" class="form">
+                    <h3>Form 1</h3>
+                    <input type="text" placeholder="Your Name" required>
+                    <textarea placeholder="Your Message" required></textarea>
+                    <button type="submit">Submit</button>
+                </form>
+
+                <form id="form2" class="form">
+                    <h3>Form 2</h3>
+                    <input type="email" placeholder="Your Email" required>
+                    <input type="text" placeholder="Subject" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        
+
+            <div class="bottom-right content">
+                <div class="uk-text-center" id="add-nodes-container"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

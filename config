@@ -1,0 +1,3 @@
+target_address xx:xx:xx:xx:xx
+le true
+config_update_wait 5

@@ -1,0 +1,50 @@
+/*
+body {
+    display: grid;
+    grid-template-columns: 1fr 2fr; 
+    height: 100vh; 
+    margin: 0;
+}
+.image-container {
+    background-color: lightblue;
+    padding: 20px;
+}
+img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+.edit-form-container {
+    background-color: lightcoral;
+    padding: 20px;
+}
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.add-nodes-container {
+    background-color: lightgreen;
+    padding: 20px;
+}
+*/
+
+.left {
+    background-color: #f0f0f0; /* Light gray for visibility */
+    height: 100vh; /* Full height of the viewport */
+}
+.top-right {
+    background-color: #0078d4; /* Blue for visibility */
+    height: 50%; /* Half of the right side */
+}
+.bottom-right {
+    background-color: #e94e77; /* Pink for visibility */
+    height: 50%; /* Half of the right side */
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 50px; /* Set a max height */
+}
+.content {
+    padding: 10px; /* Add some padding */
+}

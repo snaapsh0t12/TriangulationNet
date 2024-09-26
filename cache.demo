@@ -1,0 +1,4 @@
+# Meant to be a demo to see how the cache is structured. Has each node's ID and the last time they saw the target. This line won't exist in the real cache
+node1 1727126982.9638157
+node2 1727126982.9638154
+node3 1727126982.9638155
