@@ -56,6 +56,24 @@ The config file provides an easy interface to test different settings and distri
 - range (x, x, y, y)
   - The bounds for the search grid
 
+## Developing
+
+### Technical Overview
+
+I know and prefer Python so everything is in Python.
+
+server.py holds the server which runs on the laptop, client.py holds my progress towards the client which would be on a node.
+
+The html is held under /templates, index.html is the main dashboard. The css, js, and images is kept under /static, /static/images/image.png is the map which is constantly redrawn by calculator.py (more on this later) and served on the dashboard. map.png is the blank map.
+
+calculator.py holds the functions which take the nodes which can detect the target, their ranges, and returns an image with the possible area for the target to be in.
+
+clock.py is the py file which waits for x seconds, an then takes the cache created by server.py and uses calculator.py to generate the image. clock.py is also the place where logic for compensating for real world conditions will be.
+
+### Version Control
+
+We'll use Github for version control, a private repo for now, we can talk about open sourcing later.
+
 ### Todo
 
 - Add an option on the dashboard which has the list of nodes and their ips, and have a button for each one which pings them to see if they're online and running

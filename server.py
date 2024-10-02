@@ -3,7 +3,7 @@ This is the server file for the central server
 
 It receives pings, and uses it with the location of nodes to calculate the location of the target.
 
-This is the server file, its a basic Flask server which creates an image
+This is the server file, it's a basic Flask server which creates an image
 
 Functions:
 
