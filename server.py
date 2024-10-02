@@ -7,13 +7,13 @@ This is the server file, its a basic Flask server which creates an image
 
 Functions:
 
-    - ☐ Register | add a new or rebooted node to the network
+    - ☑ Register | add a new or rebooted node to the network
         - Pings the dashboard and tells the user to add coordinates for the node. After coordinates are received adds node to the cache (timestamp 0) and nodes database (dont want nodes without coordinates being added to the math)
 
     - ☐ Target ping | a noe tells the server it can ping the target
         - Takes the node id and the target_address from the node, and writes with the time to the cache
 
-    - ☐ Config version | node requests the current config version
+    - ☑ Config version | node requests the current config version
         - Returns the sha256 hash of the config file
 
     - ☐ Config | node requests the config file
@@ -28,12 +28,16 @@ Functions:
 """
 
 from flask import Flask, request, render_template, jsonify
-import hashlib
+import hashlib, csv
 
 app = Flask(__name__)
 
 global toAdd
 toAdd=[]
+
+# Destroy the existing node database and cache
+open('nodes.csv', 'w').close()
+open('cache', 'w').close()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -90,10 +94,24 @@ def register_final():
 
     # Write to the database
 
+    with open("nodes.csv", mode='a', newline='') as file:
+        writer = csv.writer(file)
+        
+        # Write the new row
+        writer.writerow([id, x, y])
+
+    # Write to the cache
+
+    with open('cache', 'a') as file:
+        file.write(f'{id} 0\n')
+
     return ''
 
 @app.route('/ping', methods=['POST'])
 def ping():
+
+    # Test if the node is in the database, if not tell it to register
+
     # Node can ping the target
     id = request.args.get('id')
 
@@ -145,7 +163,7 @@ def check():
 
     global toAdd
 
-    print(toAdd)
+    #print(toAdd)
 
     # I don't know whether the list of all of the nodes in toAdd should be returned or if toAdd[0] until toAdd is empty. I think the former would probably work better but I would need to change the frontend and I'm on a bus without internet access sp that's a future me promise
 

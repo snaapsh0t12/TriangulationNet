@@ -53,7 +53,10 @@ The config file provides an easy interface to test different settings and distri
   - The number of seconds before the nodes should re-check the configs on the server
 - clock_delay (int)
   - The number of seconds the clock should wait before reloading the map
+- range (x, x, y, y)
+  - The bounds for the search grid
 
 ### Todo
 
 - Add an option on the dashboard which has the list of nodes and their ips, and have a button for each one which pings them to see if they're online and running
+- Make the ping function tell the node to re register if its not already registered
