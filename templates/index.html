@@ -7,44 +7,50 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/js/uikit-icons.min.js"></script>
     <title>Triangulation Network</title>
-    <!--<link rel="stylesheet" href="/static/dashboard.css">-->
-    <script src="/static/dashboard.js"></script>
+    <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 
 <body>
-    <div class="uk-grid uk-height-1-1 uk-width-1-1" uk-grid>
-        <div class="uk-width-1-2 left">
-            <div class="image-container uk-text-center">
-                <img id="dynamic-image" src="/static/images/image.png" alt="Dynamic Image">
+
+    <style> /* For the zoomable image*/
+    </style>
+
+    <div class="uk-grid uk-height-1-1 uk-width-1-1 everything" uk-grid>
+        <div class="uk-width-1-2 uk-height-1-1 left">
+            <div class="image-container uk-text-center" id="imageContainer">
+                <img id="dynamicImage" src="/static/images/image.png" alt="Dynamic Image">
             </div>
         </div>
 
-        <div class="uk-width-1-2">
-            <div class="edit-form-container top-right uk-text-center">
-                <button onclick="toggleForm('form1')">Open Form 1</button>
-                <button onclick="toggleForm('form2')">Open Form 2</button>
+        <div class="right-container uk-width-1-2 uk-height-1-1">
+            <div class="edit-form-container top-right uk-text-center uk-height-1-2">
+                <button class="uk-button uk-button-default" onclick="toggleForm('form1')">Change Config</button>
+                <button class="uk-button uk-button-default" onclick="toggleForm('form2')">Edit Node Database</button>
 
-                <form id="form1" class="form">
+                <form id="form1" class="edit-form">
                     <h3>Form 1</h3>
-                    <input type="text" placeholder="Your Name" required>
-                    <textarea placeholder="Your Message" required></textarea>
-                    <button type="submit">Submit</button>
+                    <input class="uk-input" type="text" placeholder="Your Name" required>
+                    <input class="uk-input" type="text" placeholder="Your Name" required>
+                    <button class="uk-button uk-button-primary" type="submit">Submit</button>
                 </form>
 
-                <form id="form2" class="form">
+                <form id="form2" class="edit-form">
                     <h3>Form 2</h3>
-                    <input type="email" placeholder="Your Email" required>
-                    <input type="text" placeholder="Subject" required>
-                    <button type="submit">Submit</button>
+                    <input class="uk-input" type="email" placeholder="Your Email" required>
+                    <input class="uk-input" type="text" placeholder="Subject" required>
+                    <button class="uk-button uk-button-primary" type="submit">Submit</button>
                 </form>
             </div>
         
 
-            <div class="bottom-right content">
+            <div class="uk-height-1-2 bottom-right content">
                 <div class="uk-text-center" id="add-nodes-container"></div>
             </div>
+            
         </div>
     </div>
+
+    <script src="/static/dashboard.js"></script>
 
 </body>
 </html>

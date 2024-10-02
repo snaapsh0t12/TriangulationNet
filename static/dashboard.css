@@ -14,10 +14,6 @@ img {
     max-height: 100%;
     object-fit: cover;
 }
-.edit-form-container {
-    background-color: lightcoral;
-    padding: 20px;
-}
 button {
     margin: 10px;
     padding: 10px 20px;
@@ -31,20 +27,59 @@ button {
 }
 */
 
+.edit-form-container {
+    background-color: lightcoral;
+    padding: 20px;
+}
+
+.edit-form {
+    display: none; /* Hide forms by default */
+}
+
+.edit-form.active {
+    display: block; /* Show the form when active */
+}
+
+.everything {
+    background-color: #4e84e9; 
+    max-height: 100vh; 
+}
+
+.right-container {
+    background-color: #4ee991; 
+    max-height: 100vh; 
+}
+
 .left {
     background-color: #f0f0f0; /* Light gray for visibility */
     height: 100vh; /* Full height of the viewport */
 }
 .top-right {
     background-color: #0078d4; /* Blue for visibility */
-    height: 50%; /* Half of the right side */
+    height: 30vh; /* Half of the right side */
 }
 .bottom-right {
     background-color: #e94e77; /* Pink for visibility */
-    height: 50%; /* Half of the right side */
     overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 50px; /* Set a max height */
+    max-height: 70vh; /* Set a max height */
 }
 .content {
     padding: 10px; /* Add some padding */
+}
+
+.image-container {
+    overflow: hidden;
+    position: relative;
+    width: 50vw;
+    height: 100vh; /* I can't make this 100% for some reason, so all of this code will be optimized for specifically this laptop I suppose*/
+    cursor: grab; /* Indicate draggable area */
+}
+
+.image-container img {
+    transition: transform 0.2s; /* Smooth transition for zooming */
+    transform-origin: center center; /* Zooming from center */
+    max-width: none; /* Prevent the image from being constrained */
+    position: absolute; /* Allow positioning */
+    top: 0; 
+    left: 0; 
 }

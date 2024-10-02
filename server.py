@@ -7,22 +7,22 @@ This is the server file, its a basic Flask server which creates an image
 
 Functions:
 
-    - Register | add a new or rebooted node to the network
+    - ☐ Register | add a new or rebooted node to the network
         - Pings the dashboard and tells the user to add coordinates for the node. After coordinates are received adds node to the cache (timestamp 0) and nodes database (dont want nodes without coordinates being added to the math)
 
-    - Target ping | a noe tells the server it can ping the target
+    - ☐ Target ping | a noe tells the server it can ping the target
         - Takes the node id and the target_address from the node, and writes with the time to the cache
 
-    - Config version | node requests the current config version
+    - ☐ Config version | node requests the current config version
         - Returns the sha256 hash of the config file
 
-    - Config | node requests the config file
+    - ☐ Config | node requests the config file
         - Returns a file.read() of the config file
 
-    - Config change | user changes the config file form the dashboard
+    - ☐ Config change | user changes the config file form the dashboard
         - Takes the new config parameters and writes them to the config file
 
-    - Database change | user wants to change the coordinates of a node (submits the coordinates and ids for all node because I hate frontend)
+    - ☐ Database change | user wants to change the coordinates of a node (submits the coordinates and ids for all nodes because I hate frontend)
         - Takes the ids and coordinates for the nodes and writes them to the database
 
 """
@@ -44,25 +44,53 @@ def index():
 
 @app.route('/register', methods=['POST'])
 def register():
-    # For the nodes only, the form to actually register nodes is at /register_final
-    global toAdd
-    id = request.args.get('id')
-    toAdd.append(id)
+    # For the nodes only, the form to actually register nodes on the is at /register_final
 
-    # Ping the dashboard with the id
-    
-    return 
+    global toAdd
+
+    data = request.json
+    id = data.get('id')
+
+    # Add logic to make sure that submitted is a valid mac address here
+
+    if id is not None and id not in toAdd:
+        toAdd.append(id)
+        return "Added"
+
+    return "Failed"
 
 @app.route('/register_final', methods=['POST'])
 def register_final():
     # For the user submitted form
-    id = request.args.get('id')
-    x = request.args.get('x')
-    y = request.args.get('y')
+
+    global toAdd
+    
+    data = request.json
+
+    id = data.get('id')
+    data = data.get('data')
+
+    x=data.split(",")[0].replace(" ", "")
+    y=data.split(",")[0].replace(" ", "")
+
+    """
+    # This can be commented for debugging, but should be uncommented for production
+    try:
+        x=int(x)
+        y=int(y)
+    except:
+        print("Not formatted correctly")
+        return ''
+
+    """
+
+    toAdd.remove(id)
+
+    print(id, x, y)
 
     # Write to the database
-    
-    return 
+
+    return ''
 
 @app.route('/ping', methods=['POST'])
 def ping():
@@ -112,30 +140,29 @@ def database_change():
 
     return 
 
-global reposnes
-reposnes=0
 @app.route('/check', methods=['GET'])
 def check():
 
-    global reposnes
+    global toAdd
 
-    response = {}
+    print(toAdd)
 
-    if reposnes%1==0:
-        print("Sent  check response")
-        response = {"title": "My Title"+str(reposnes)}
+    # I don't know whether the list of all of the nodes in toAdd should be returned or if toAdd[0] until toAdd is empty. I think the former would probably work better but I would need to change the frontend and I'm on a bus without internet access sp that's a future me promise
 
-    reposnes+=1
+    response = []
+    
+    # The nodes aren't taking the title for title , so I need to 
+    if len(toAdd) > 0:
+
+        response = toAdd
+        #toAdd.pop(0) #toAdd is all of the nodes which need to be added with coordinates
     
     return jsonify(response)
 
 @app.route('/submit', methods=['POST'])
 def submit():
+    return "I don't think I need this method"
 
-    print(request.get_json())
-
-
-    return "woah"
 
 @app.route('/nt', methods=['GET'])
 def notify():
