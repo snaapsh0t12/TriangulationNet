@@ -2,6 +2,14 @@
 
 This is the code for a research project. It's goal is to determine how well an attacker can track a live target by using the bluetooth signals that the target's everyday electronics give off (smartwatches, earbuds, etc). There will be many nodes placed in an area which report whether they can detect the target mac address to a central computer. The central computer then uses that to triangulate where the target is on a map and track their real-time location.
 
+## Running
+
+If you want to run it, clone the repo, create a python virtual environment from the requirments file with `python -m venv env` and then `pip install -r requirments.txt`, and then run it with `python3 server.py`
+
+This will start the server, there's a basic cline tin client.py which registers a node
+
+**This software is in no way stable**
+
 ## Parts
 
 ### Nodes
