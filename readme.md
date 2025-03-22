@@ -4,11 +4,15 @@ This is the code for a research project. It's goal is to determine how well an a
 
 ## Running
 
-If you want to run it, clone the repo, create a python virtual environment from the requirments file with `python -m venv env` and then `pip install -r requirments.txt`, and then run it with `python3 server.py`
+If you want to run it, clone the repo, create a python virtual environment from the requirements file with `python -m venv env` and then `pip install -r requirments.txt`, and then run it with `python3 server.py`
 
 This will start the server, there's a basic cline tin client.py which registers a node
 
 **This software is in no way stable**
+
+## TODO
+
+- Adjust to wifi for kiwi bots
 
 ## Parts
 
@@ -54,21 +58,25 @@ server.py and clock.py will have to run at the same time
 The config file provides an easy interface to test different settings and distribute to the many followers with ease. When nodes boot up they read the config and adjust
 
 - target_address (string)
-  - The target's bluetooth mac address
+  - A regex string for the target's bluetooth or wifi mac address, can be a comma-separate list of targets
+- detection_method (wifi/bluetooth)
+  - Whether to use bluetooth or wifi for target detection
 - le (bool)
-  - Whether to scan le or just scan on the nodes
+  - Whether to scan le or just scan on the nodes (only when detection_method=bluetooth)
 - config_update_wait (int)
   - The number of seconds before the nodes should re-check the configs on the server
 - clock_delay (int)
   - The number of seconds the clock should wait before reloading the map
 - range (x, x, y, y)
   - The bounds for the search grid
+- offline (bool)
+  - Whether the ping signatures should be reported to a central server. Some situations might not allow the node to send the pings over a network, so the pings will be saved in a file specified in offline_report_file (default is ./logs)
+- offline_report_file (file/path/string)
+  - The file path to the report that offline logs should be saved to if offline is set to True
 
 ## Developing
 
 ### Technical Overview
-
-I know and prefer Python so everything is in Python.
 
 server.py holds the server which runs on the laptop, client.py holds my progress towards the client which would be on a node.
 
@@ -78,11 +86,12 @@ calculator.py holds the functions which take the nodes which can detect the targ
 
 clock.py is the py file which waits for x seconds, an then takes the cache created by server.py and uses calculator.py to generate the image. clock.py is also the place where logic for compensating for real world conditions will be.
 
-### Version Control
-
-We'll use Github for version control, a private repo for now, we can talk about open sourcing later.
-
 ### Todo
 
 - Add an option on the dashboard which has the list of nodes and their ips, and have a button for each one which pings them to see if they're online and running
 - Make the ping function tell the node to re register if its not already registered
+- Add offline function to save logs to an offline file which can be collected and correlated later
+- Make calculations take signal strength into account
+- Make calculations take multiple targets into account and add tracking to map
+- Add a way to give nodes an ip endpoint for the central server
+- Add a way to save the images for different times and compress them into a video for a time lapse or non time lapse playback

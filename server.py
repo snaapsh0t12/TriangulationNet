@@ -28,7 +28,7 @@ Functions:
 """
 
 from flask import Flask, request, render_template, jsonify
-import hashlib, csv
+import hashlib, csv, time
 
 app = Flask(__name__)
 
@@ -36,7 +36,7 @@ global toAdd
 toAdd=[]
 
 # Destroy the existing node database and cache
-open('nodes.csv', 'w').close()
+#open('nodes.csv', 'w').close()
 open('cache', 'w').close()
 
 @app.route('/', methods=['GET'])
@@ -113,11 +113,22 @@ def ping():
     # Test if the node is in the database, if not tell it to register
 
     # Node can ping the target
-    id = request.args.get('id')
+    data = request.get_json()
+
+    id = data.get('id')
+    ssid = data.get('ssid')  # This label should be changed so it can apply to bluetooth and wifi signals
+    strength = data.get('strength')
+
+    print(id, ssid, strength)
+
+    # Add target filtering here, make nodes do this in the future but they need to load the config from the central server
 
     # Write to the cache
+
+    with open("cache", "a") as file:
+        file.write(f"{id} {strength} {time.time()}\n")
     
-    return 
+    return "Accepted"
 
 @app.route('/config_version', methods=['GET'])
 def config_version():

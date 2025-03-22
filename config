@@ -1,3 +1,5 @@
-target_address xx:xx:xx:xx:xx
+target_address waz
 le true
 config_update_wait 5
+offline false
+detection_method wifi
