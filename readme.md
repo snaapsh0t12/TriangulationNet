@@ -10,10 +10,6 @@ This will start the server, there's a basic cline tin client.py which registers 
 
 **This software is in no way stable**
 
-## TODO
-
-- Adjust to wifi for kiwi bots
-
 ## Parts
 
 ### Nodes
