@@ -6,6 +6,8 @@ Therefore, it only handles a single target detected by a single node, so it just
 Range in this case will be feet. It should be just plain feet but the nodes will be inside so that complicates things, we'll probably just manually measure it with the nodes inside and adjust accordingly
 """
 
+import time
+
 class Node:
   def __init__(self, name, id, x, y, range, signal_detected=False):
     self.name = name
@@ -15,8 +17,8 @@ class Node:
     self.range = range
     self.signal_detected = False
 
-node1 = Node("Lab node", "5a:84:f7:9b:1f:09", 1, 1, 15)
-node2 = Node("VLL node", "mac_address", 10, 10, 15)
+node1 = Node("Lab node", "ce:a1:2b:b3:e3:5c", 30, 15, 5)
+node2 = Node("VLL node", "mac_address", 53, 10, 5)
 
 import math
 import matplotlib.pyplot as plt
@@ -24,7 +26,7 @@ import matplotlib.image as mpimg
 
 # Example Node class
 
-def update_nodes_from_cache(node1, node2, cache_file='cache.txt'):
+def update_nodes_from_cache(node1, node2, cache_file='cache'):
     """
     Reads the cache file to determine which node last detected the target.
     Each line in the file is in the format: "id strength timestamp".
@@ -47,6 +49,8 @@ def update_nodes_from_cache(node1, node2, cache_file='cache.txt'):
 
     if not signals:
         print("No valid signals found in cache.")
+        node1.signal_detected = False
+        node2.signal_detected = False
         return
 
     # Determine the most recent signal by timestamp
@@ -74,7 +78,32 @@ def plot_target(node1, node2, angle_degrees=45):
 
     if active_node is None:
         print("No detection signal from either node.")
+
+        plt.figure(figsize=(10, 10))
+        img = mpimg.imread('static/images/dark_map.png')
+        plt.imshow(img, extent=[0, 100, 0, 40])
+
+        for node in (node1, node2):
+            circle = plt.Circle((node.x, node.y), node.range, color='blue', fill=False, linestyle=(0, (1, 10)))
+            plt.gca().add_artist(circle)
+            plt.plot(node.x, node.y, 'o', label=node.id)
+            plt.text(node.x, node.y, f' {node.id}', fontsize=10, verticalalignment='bottom', color="white")
+
+        plt.xlim(0, 100)
+        plt.ylim(0, 40)
+        plt.title(f'Target Detection (Target not found)')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.axhline(0, color='black', linewidth=0.5, linestyle='--')
+        plt.axvline(0, color='black', linewidth=0.5, linestyle='--')
+        plt.grid(color='gray', linestyle='--', linewidth=0.5)
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.savefig('static/images/image.png')
+        plt.savefig('logs/images/image'+str(time.time())+'.png')
+        plt.close()
+
         return
+
 
     # Compute target position as an offset from the active node
     angle = math.radians(angle_degrees)
@@ -83,22 +112,22 @@ def plot_target(node1, node2, angle_degrees=45):
 
     # Set up the plot with a background image
     plt.figure(figsize=(10, 10))
-    img = mpimg.imread('static/images/map.png')
-    plt.imshow(img, extent=[-20, 100, -20, 40])  # Adjust extent as needed
+    img = mpimg.imread('static/images/dark_map.png')
+    plt.imshow(img, extent=[0, 100, 0, 40])
 
     # Plot each node and its detection range circle
     for node in (node1, node2):
         circle = plt.Circle((node.x, node.y), node.range, color='blue', fill=False, linestyle=(0, (1, 10)))
         plt.gca().add_artist(circle)
         plt.plot(node.x, node.y, 'o', label=node.id)
-        plt.text(node.x, node.y, f' {node.id}', fontsize=10, verticalalignment='bottom')
+        plt.text(node.x, node.y, f' {node.id}', fontsize=10, verticalalignment='bottom', color="white")
 
     # Mark the target position (red star)
     plt.plot(target_x, target_y, 'r*', markersize=15, label='Target')
 
     # Additional plot settings
-    plt.xlim(-20, 100)
-    plt.ylim(-20, 40)
+    plt.xlim(0, 100)
+    plt.ylim(0, 40)
     plt.title(f'Target Detection (Active Node: {active_node.id})')
     plt.xlabel('X')
     plt.ylabel('Y')
@@ -107,6 +136,9 @@ def plot_target(node1, node2, angle_degrees=45):
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
     plt.gca().set_aspect('equal', adjustable='box')
     plt.savefig('static/images/image.png')
+    plt.savefig('logs/images/image'+str(time.time())+'.png')
+    plt.close()
+
     #plt.show()
 
 
@@ -115,4 +147,6 @@ while True:
     update_nodes_from_cache(node1, node2, cache_file='cache')
 
     # Plot the nodes and the computed target location
-    plot_target(node1, node2, angle_degrees=45)
+    plot_target(node1, node2, angle_degrees=225)
+    open('cache', 'w').close()
+    time.sleep(1)

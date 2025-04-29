@@ -1,7 +1,9 @@
 """
+The code for the client nodes
+
 TODO:
     - Needs to get the config from the server
-    - Needs to register itself with tits mac address
+    - Needs to register itself with its mac address
     - Needs to ping the server with signatures
 """
 
@@ -67,6 +69,9 @@ def main():
     while True:
         rescan_wifi()
         networks = get_wifi_networks()
+        #print(networks)
+
+
         if not networks:
             print("No Wi-Fi networks found.")
         else:
@@ -80,7 +85,7 @@ def main():
                 ping = {'id': mac_address, 'ssid': ssid, 'strength': signal}
                 x = requests.post(url+"/ping", json = ping)
 
-                #print(f"SSID: {ssid}, Signal Strength: {signal}%")
+                print(f"SSID: {ssid}, Signal Strength: {signal}%")
         
         time.sleep(1)
         

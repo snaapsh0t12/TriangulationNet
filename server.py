@@ -10,7 +10,7 @@ Functions:
     - ☑ Register | add a new or rebooted node to the network
         - Pings the dashboard and tells the user to add coordinates for the node. After coordinates are received adds node to the cache (timestamp 0) and nodes database (dont want nodes without coordinates being added to the math)
 
-    - ☐ Target ping | a noe tells the server it can ping the target
+    - ☐ Target ping | a node tells the server it can ping the target
         - Takes the node id and the target_address from the node, and writes with the time to the cache
 
     - ☑ Config version | node requests the current config version

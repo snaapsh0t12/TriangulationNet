@@ -1,4 +1,4 @@
-target_address waz
+target_address edu
 le true
 config_update_wait 5
 offline false
