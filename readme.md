@@ -6,7 +6,7 @@ This is the code for a research project. It's goal is to determine how well an a
 
 If you want to run it, clone the repo, create a python virtual environment from the requirements file with `python -m venv env` and then `pip install -r requirments.txt`, and then run it with `python3 server.py`
 
-This will start the server, there's a basic cline tin client.py which registers a node
+This will start the server, there's a basic client in client.py which registers a node
 
 **This software is in no way stable**
 
@@ -80,14 +80,15 @@ The html is held under /templates, index.html is the main dashboard. The css, js
 
 calculator.py holds the functions which take the nodes which can detect the target, their ranges, and returns an image with the possible area for the target to be in.
 
-clock.py is the py file which waits for x seconds, an then takes the cache created by server.py and uses calculator.py to generate the image. clock.py is also the place where logic for compensating for real world conditions will be.
+clock.py is the py file which waits for x seconds, then takes the cache created by server.py and uses calculator.py to generate the image and logs. Also the place where logic for compensating for real world conditions will be.
 
 ### Todo
 
 - Add an option on the dashboard which has the list of nodes and their ips, and have a button for each one which pings them to see if they're online and running
 - Make the ping function tell the node to re register if its not already registered
 - Add offline function to save logs to an offline file which can be collected and correlated later
-- Make calculations take signal strength into account
-- Make calculations take multiple targets into account and add tracking to map
+- Make calculations take signal strength into account form
+- Adjust to be able to track multiple targets instead of one as originally planned
 - Add a way to give nodes an ip endpoint for the central server. Maybe retrieve from blugold.group?
 - Add a way to save the images for different times and compress them into a video for a time lapse or non time lapse playback
+- Add way to log where the targets are over time

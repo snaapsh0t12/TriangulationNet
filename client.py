@@ -5,6 +5,7 @@ TODO:
     - Needs to get the config from the server
     - Needs to register itself with its mac address
     - Needs to ping the server with signatures
+    - Needs to reload the config every config_update_wait seconds
 """
 
 import subprocess

@@ -3,3 +3,4 @@ le true
 config_update_wait 5
 offline false
 detection_method wifi
+clock_delay 5
