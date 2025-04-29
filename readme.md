@@ -89,5 +89,5 @@ clock.py is the py file which waits for x seconds, an then takes the cache creat
 - Add offline function to save logs to an offline file which can be collected and correlated later
 - Make calculations take signal strength into account
 - Make calculations take multiple targets into account and add tracking to map
-- Add a way to give nodes an ip endpoint for the central server
+- Add a way to give nodes an ip endpoint for the central server. Maybe retrieve from blugold.group?
 - Add a way to save the images for different times and compress them into a video for a time lapse or non time lapse playback
