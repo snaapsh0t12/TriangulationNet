@@ -1,0 +1,32 @@
+Time: 1754346125.3173625
+no_coordinates
+# Meant to be a demo to see how the cache is structured. Has each node's ID and the last time they saw the target. This line won't exist in the real cache
+node1 1727126982.9638157
+node2 1727126982.9638154
+node3 1727126982.9638155
+---
+Time: 1754346130.0009456
+no_coordinates
+# Meant to be a demo to see how the cache is structured. Has each node's ID and the last time they saw the target. This line won't exist in the real cache
+node1 1727126982.9638157
+node2 1727126982.9638154
+node3 1727126982.9638155
+---
+Time: 1754346130.2428215
+no_coordinates
+# Meant to be a demo to see how the cache is structured. Has each node's ID and the last time they saw the target. This line won't exist in the real cache
+node1 1727126982.9638157
+node2 1727126982.9638154
+node3 1727126982.9638155---
+Time: 1754346130.4928212
+no_coordinates
+# Meant to be a demo to see how the cache is structured. Has each node's ID and the last time they saw the target. This line won't exist in the real cache
+node1 1727126982.9638157
+node2 1727126982.9638154
+node3 1727126982.9638155---
+Time: 1754346130.7386591
+no_coordinates
+# Meant to be a demo to see how the cache is structured. Has each node's ID and the last time they saw the target. This line won't exist in the real cache
+node1 1727126982.9638157
+node2 1727126982.9638154
+node3 1727126982.9638155---

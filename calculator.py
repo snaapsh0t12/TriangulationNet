@@ -20,7 +20,7 @@ def get_coordinates(node_id):
                 return (x, y)
     return None  # Return None if the node ID is not found
 
-def possible_coordinates(detecting_nodes, non_detecting_nodes, csv_file='nodes.csv'):
+def possible_coordinates(detecting_nodes, csv_file='nodes.csv'):
     detected_coordinates = None  # To hold the intersection of possible coordinates
     nodes = {}
 
@@ -51,6 +51,12 @@ def possible_coordinates(detecting_nodes, non_detecting_nodes, csv_file='nodes.c
                 detected_coordinates &= current_coordinates  # Intersection
 
     # Remove coordinates that fall within the range of non-detecting nodes
+    non_detecting_nodes=[]
+
+    for i in nodes:
+        if i[0] not in detecting_nodes:
+            non_detecting_nodes.append(i[0])
+    
     for node_id in non_detecting_nodes:
         if node_id in nodes:
             x, y, range_value = nodes[node_id]
@@ -63,7 +69,7 @@ def possible_coordinates(detecting_nodes, non_detecting_nodes, csv_file='nodes.c
     plt.figure(figsize=(10, 10))
     
     # Load and display the background image
-    img = mpimg.imread('static/images/map.png')
+    img = mpimg.imread('static/images/dark_map.png')
     plt.imshow(img, extent=[-20, 100, -20, 40])  # Adjust extent to fit your coordinates
     
     # Plot each node with its range
@@ -77,6 +83,7 @@ def possible_coordinates(detecting_nodes, non_detecting_nodes, csv_file='nodes.c
     # Highlight the shared possible coordinates
     if detected_coordinates:
         x_coords, y_coords = zip(*detected_coordinates)
+        print(x_coords, y_coords)
         plt.scatter(x_coords, y_coords, color='red', marker='x', label='Possible Coordinates')
 
     plt.xlim(-20, 100)  # Adjust limits as necessary
@@ -90,11 +97,14 @@ def possible_coordinates(detecting_nodes, non_detecting_nodes, csv_file='nodes.c
     #plt.legend() #Enable this for the legend
     plt.savefig('static/images/image.png')
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.show()
+    #plt.show()
 
-    #return list(detected_coordinates)
+    if detected_coordinates is None:
+        return None
+    else:
+        return list(detected_coordinates)
 
-detecting_nodes = ['node1', 'node2']
-non_detecting_nodes = ['node4', 'node3']
-possible_coordinates(detecting_nodes, non_detecting_nodes)
+#detecting_nodes = ['node1', 'node2']
+#non_detecting_nodes = ['node4', 'node3']
+#possible_coordinates(detecting_nodes, non_detecting_nodes)
 

@@ -20,7 +20,7 @@ When booted up, it sends a notification to the server and retrieves configuratio
 
 Note: They do not recheck and send a new notification every x seconds, they only send a notification when they can sense the target, they lie in wait otherwise
 
-To ping, the node uses {that blueoth hcitool line} and scans the output for the target_address. If it finds the address, sends a notifications to the server with the node's id mac address and the target's target_address (because the config may have changed since the last time they retrieved the config and a new target_address may be in use (if the address is wrong, the server will return a response saying that the node needs to update the config))
+To ping, the and scans the output for the target_address. If it finds the address, sends a notifications to the server with the node's id mac address and the target's target_address (because the config may have changed since the last time they retrieved the config and a new target_address may be in use (if the address is wrong, the server will return a response saying that the node needs to update the config))
 
 The nodes also recheck the server's config file every config_update_wait seconds (they request the hash from the server and if different from the local one redownloads)
 

@@ -6,11 +6,9 @@ It runs in a separate process as the server so that it can run with its own time
 """
 
 import time
-
-global config
+import calculator
 
 def read_config():
-    global config
 
     config = {}
     
@@ -22,24 +20,36 @@ def read_config():
                 var_name, var_value = line.split(maxsplit=1)  # Split into name and value
                 config[var_name] = var_value
 
-def write_logs(data):
-    print(data)
+    return config
 
-def write_map(data):
-    print(data)
+def write_logs(strengths):
+    # Write the strength for each node, the coordinates that the target is in, and the time to the logs
+
+    coordinates = calculator.possible_coordinates(strengths) # This gets all possible coordinates in range of all of the nodes, not using fancy math to determine the best point between them  # This function also maps the coordinates to the map
+
+    if coordinates is None:
+        coordinates = "no_coordinates"
+
+    with open("log.log", "a") as f:
+        f.write(f"Time: {time.time()}\n")
+        f.write(coordinates+"\n")
+        print("STRENGTHS", strengths)
+        f.writelines(strengths)
+        f.write("\n---\n")
 
 def process_cache():
-    # Takes the cache, filters for data we need, and uses calculator.py to calculate positioning, then calls write_logs() and write_map()
-    return "cache"
+    # Takes the cache, filters for data we need, and uses calculator.py to calculate positioning, then calls write_logs()
+    
+    with open("cache.demo", "r") as f:
+        cache = f.readlines()
 
     open('cache', 'w').close()
 
-    write_logs()
-    write_map()
+    write_logs(cache)
 
 
 last_read_config = time.time()
-read_config()
+config = read_config()
 
 last_read_cache = time.time()
 process_cache()
@@ -47,9 +57,13 @@ process_cache()
 while True:
 
     if time.time() - last_read_config > int(config['config_update_wait']):
-        read_config()
+        # Update the config
+
+        config = read_config()
 
     if time.time() - last_read_cache > int(config['clock_delay']):
+        # Read the cache and pass to calculator
+
         process_cache()
 
 
