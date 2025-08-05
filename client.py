@@ -15,7 +15,7 @@ import requests
 from getmac import get_mac_address
 mac_address = get_mac_address()
 
-url = 'http://127.0.0.1:5000/'
+url = 'http://172.234.20.247:5001/'
 
 # Register the node
 registration = {'id': mac_address}

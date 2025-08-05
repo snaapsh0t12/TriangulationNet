@@ -55,8 +55,6 @@ def register():
     data = request.json
     id = data.get('id')
 
-    # Add logic to make sure that submitted is a valid mac address here
-
     if id is not None and id not in toAdd:
         toAdd.append(id)
         return "Added"

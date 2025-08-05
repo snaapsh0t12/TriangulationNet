@@ -98,6 +98,7 @@ def possible_coordinates(detecting_nodes, csv_file='nodes.csv'):
     plt.savefig('static/images/image.png')
     plt.gca().set_aspect('equal', adjustable='box')
     #plt.show()
+    plt.close()
 
     if detected_coordinates is None:
         return None

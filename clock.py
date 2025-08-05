@@ -40,7 +40,7 @@ def write_logs(strengths):
 def process_cache():
     # Takes the cache, filters for data we need, and uses calculator.py to calculate positioning, then calls write_logs()
     
-    with open("cache.demo", "r") as f:
+    with open("cache", "r") as f:
         cache = f.readlines()
 
     open('cache', 'w').close()

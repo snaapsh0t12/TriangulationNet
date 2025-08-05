@@ -69,7 +69,6 @@ def main():
         networks = get_wifi_networks()
         #print(networks)
 
-
         if not networks:
             print("No Wi-Fi networks found.")
         else:
