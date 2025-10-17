@@ -27,7 +27,7 @@ Functions:
 
 """
 
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, send_file, Response
 import hashlib, csv, time
 
 app = Flask(__name__)
@@ -196,6 +196,14 @@ def notify():
     # The index webpage with the real time map of the network
     
     return render_template('notify.html')
+
+@app.route('/data', methods=['GET'])
+def data():
+    # Grabbing data
+    csv_data = open("data/node1.csv", "r").read()
+    response = Response(csv_data, content_type="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=users.csv"
+    return response
 
 
 

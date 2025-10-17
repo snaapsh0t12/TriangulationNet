@@ -91,4 +91,5 @@ clock.py is the py file which waits for x seconds, then takes the cache created 
 - Adjust to be able to track multiple targets instead of one as originally planned
 - Add a way to give nodes an ip endpoint for the central server. Maybe retrieve from blugold.group?
 - Add a way to save the images for different times and compress them into a video for a time lapse or non time lapse playback
-- Add way to log where the targets are over time
+- Add way to log where the targets are over time (Maybe log into seperate files the coordinates and time?)
+- Something to simulate the kiwibots to test without having to go out for field testing

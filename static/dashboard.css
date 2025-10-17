@@ -26,7 +26,11 @@ button {
     padding: 20px;
 }
 */
-
+body {
+    background-color:rgb(24, 22, 35);
+    /* height: 100%; */
+    height:100vb
+}
 .edit-form-container {
     background-color: lightcoral;
     padding: 20px;
