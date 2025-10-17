@@ -199,8 +199,17 @@ def notify():
 
 @app.route('/data', methods=['GET'])
 def data():
-    # Grabbing data
+    # Grabbing data csv
     csv_data = open("data/node1.csv", "r").read()
+    response = Response(csv_data, content_type="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=users.csv"
+    return response
+
+@app.route('/nodes', methods=['GET'])
+def node_coords():
+    # Grabs the nodes.csv
+    # the data should be node#,x,y,range(m)
+    csv_data = open("nodes.csv", "r").read()
     response = Response(csv_data, content_type="text/csv")
     response.headers["Content-Disposition"] = "attachment; filename=users.csv"
     return response
