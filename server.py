@@ -202,7 +202,7 @@ def data():
     # Grabbing data csv
     csv_data = open("data/node1.csv", "r").read()
     response = Response(csv_data, content_type="text/csv")
-    response.headers["Content-Disposition"] = "attachment; filename=users.csv"
+    response.headers["Content-Disposition"] = "attachment; filename=data.csv"
     return response
 
 @app.route('/nodes', methods=['GET'])
@@ -211,7 +211,7 @@ def node_coords():
     # the data should be node#,x,y,range(m)
     csv_data = open("nodes.csv", "r").read()
     response = Response(csv_data, content_type="text/csv")
-    response.headers["Content-Disposition"] = "attachment; filename=users.csv"
+    response.headers["Content-Disposition"] = "attachment; filename=nodes.csv"
     return response
 
 

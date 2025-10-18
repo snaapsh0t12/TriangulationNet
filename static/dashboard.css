@@ -31,6 +31,12 @@ body {
     /* height: 100%; */
     height:100vb
 }
+
+#container {
+    
+}
+
+
 .edit-form-container {
     background-color: lightcoral;
     padding: 20px;
