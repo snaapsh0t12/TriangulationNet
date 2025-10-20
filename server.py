@@ -37,7 +37,7 @@ toAdd=[]
 
 # Destroy the existing node database and cache
 #open('nodes.csv', 'w').close()
-open('cache', 'w').close()
+open('data/cache', 'w').close()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -92,7 +92,7 @@ def register_final():
 
     # Write to the database
 
-    with open("nodes.csv", mode='a', newline='') as file:
+    with open("data/nodes.csv", mode='a', newline='') as file:
         writer = csv.writer(file)
         
         # Write the new row
@@ -100,7 +100,7 @@ def register_final():
 
     # Write to the cache
 
-    with open('cache', 'a') as file:
+    with open('data/cache', 'a') as file:
         file.write(f'{id} 0\n')
 
     return ''
@@ -124,7 +124,7 @@ def ping():
     # Write to the cache
 
     with open("cache", "a") as file:
-        file.write(f"{id} {strength} {time.time()}\n")
+        file.write(f"{id} {strength} {round(time.time())}\n")
     
     return "Accepted"
 
@@ -209,7 +209,7 @@ def data():
 def node_coords():
     # Grabs the nodes.csv
     # the data should be node#,x,y,range(m)
-    csv_data = open("nodes.csv", "r").read()
+    csv_data = open("data/nodes.csv", "r").read()
     response = Response(csv_data, content_type="text/csv")
     response.headers["Content-Disposition"] = "attachment; filename=nodes.csv"
     return response

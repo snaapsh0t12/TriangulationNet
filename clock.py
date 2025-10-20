@@ -7,6 +7,7 @@ It runs in a separate process as the server so that it can run with its own time
 
 import time
 import calculator
+import csv
 
 def read_config():
 
@@ -22,28 +23,34 @@ def read_config():
 
     return config
 
-def write_logs(strengths):
+def write_logs(cache):
     # Write the strength for each node, the coordinates that the target is in, and the time to the logs
+    detected_nodes = []
+    
+    for line in cache:
+        detected_nodes.append(line.split()[0])
+    
+    print(detected_nodes)
 
-    coordinates = calculator.possible_coordinates(strengths) # This gets all possible coordinates in range of all of the nodes, not using fancy math to determine the best point between them  # This function also maps the coordinates to the map
+    coordinates = calculator.possible_coordinates(detected_nodes) # This gets all possible coordinates in range of all of the nodes, not using fancy math to determine the best point between them  # This function also maps the coordinates to the map
 
     if coordinates is None:
         coordinates = "no_coordinates"
 
     with open("log.log", "a") as f:
-        f.write(f"Time: {time.time()}\n")
-        f.write(coordinates+"\n")
-        print("STRENGTHS", strengths)
-        f.writelines(strengths)
+        f.write(f"Time: {round(time.time())}\n")
+        f.write(f"{coordinates}\n")
+        # print("STRENGTHS", strengths)
+        f.writelines(detected_nodes)
         f.write("\n---\n")
 
 def process_cache():
     # Takes the cache, filters for data we need, and uses calculator.py to calculate positioning, then calls write_logs()
     
-    with open("cache", "r") as f:
+    with open("data/cache", "r") as f:
         cache = f.readlines()
 
-    open('cache', 'w').close()
+    # open('cache', 'w').close()
 
     write_logs(cache)
 
