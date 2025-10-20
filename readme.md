@@ -93,3 +93,6 @@ clock.py is the py file which waits for x seconds, then takes the cache created 
 - Add a way to save the images for different times and compress them into a video for a time lapse or non time lapse playback
 - Add way to log where the targets are over time (Maybe log into seperate files the coordinates and time?)
 - Rewrite the coordinate finder function
+- Maybe figure out a way to make a mesh-network
+- Make a client for esp-32
+- Node dots light up when it detects a kiwi bot?

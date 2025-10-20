@@ -26,6 +26,18 @@ button {
     padding: 20px;
 }
 */
+
+:root {
+    --background: #0f0915;
+    --primary: #b68adf;
+    --secondary: #51148b;
+}
+
+button {
+    color: #221e27!important;
+    background-color: #b68adf!important;
+}
+
 body {
     background-color:rgb(24, 22, 35);
     /* height: 100%; */
@@ -36,18 +48,29 @@ body {
     
 }
 
+svg {
+    overflow: visible;
+}
+
 
 .edit-form-container {
     background-color: lightcoral;
+    color: #dff9fb;
     padding: 20px;
 }
 
 .edit-form {
     display: none; /* Hide forms by default */
+    color: #ffffff;
 }
 
 .edit-form.active {
     display: block; /* Show the form when active */
+    color: #ffffff;
+}
+
+h3 {
+    color: #ffffff;
 }
 
 .everything {
@@ -56,16 +79,19 @@ body {
 }
 
 .right-container {
-    background-color: #4ee991; 
+    background-color: #0f0915; 
     max-height: 100vh; 
 }
 
 .left {
-    background-color: #f0f0f0; /* Light gray for visibility */
+    background-color: #0f0915; /* Light gray for visibility */
     height: 100vh; /* Full height of the viewport */
+        border-right-color: grey;
+    border-right-width: 50px;
 }
 .top-right {
-    background-color: #0078d4; /* Blue for visibility */
+    background-color: #51148b; /* Blue for visibility */
+    color: #18161c;
     height: 30vh; /* Half of the right side */
 }
 .bottom-right {

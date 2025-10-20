@@ -10,6 +10,10 @@ const svg = d3.select("#container")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    .attr("id", "dynamicImage")
+    // .call(d3.zoom().on("zoom", function () {
+    //     svg.attr("transform", d3.event.transform)
+    // }))
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -86,6 +90,15 @@ svg.append('g')
             .duration(150)
             .attr("r", 5); // grow circle
         });
+
+// Define zoom behavior
+const zoom = d3.zoom()
+    .scaleExtent([0.5, 10]) // min and max zoom levels
+    .on("zoom", (event) => {
+        svg.attr("transform", event.transform); // apply zoom transform to group
+    });
+
+svg.call(zoom);
 
 })
 
