@@ -54,8 +54,12 @@ def register():
 
     data = request.json
     id = data.get('id')
+    csv_data = csv.reader("data/nodes.csv", delimeter=",") # gets mac addresses from nodes.csv so we don't reregister
+    mac_addresses = []
+    for row in csv_data:
+        mac_addresses.append(row[0])
 
-    if id is not None and id not in toAdd:
+    if id is not None and id not in toAdd and id not in mac_addresses:
         toAdd.append(id)
         return "Added"
 
@@ -123,7 +127,7 @@ def ping():
 
     # Write to the cache
 
-    with open("cache", "a") as file:
+    with open("data/cache", "a") as file:
         file.write(f"{id} {strength} {round(time.time())}\n")
     
     return "Accepted"
@@ -200,7 +204,7 @@ def notify():
 @app.route('/data', methods=['GET'])
 def data():
     # Grabbing data csv
-    csv_data = open("data/node1.csv", "r").read()
+    csv_data = open("data/coordinates.csv", "r").read()
     response = Response(csv_data, content_type="text/csv")
     response.headers["Content-Disposition"] = "attachment; filename=data.csv"
     return response
