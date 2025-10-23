@@ -11,8 +11,9 @@ import matplotlib.image as mpimg
 
 def get_coordinates(node_id):
     # Takes a node id, looks in nodes.csv to return the coordinates for that id
-    with open("nodes.csv", mode='r') as file:
+    with open("data/nodes.csv", mode='r') as file:
         reader = csv.reader(file)
+        next(reader) # Skips the header row
         for row in reader:
             if row[0] == node_id: 
                 x = int(row[1])
@@ -20,13 +21,14 @@ def get_coordinates(node_id):
                 return (x, y)
     return None  # Return None if the node ID is not found
 
-def possible_coordinates(detecting_nodes, csv_file='nodes.csv'):
+def possible_coordinates(detecting_nodes, csv_file='data/nodes.csv'):
     detected_coordinates = None  # To hold the intersection of possible coordinates
     nodes = {}
 
     # Load node data from CSV
     with open(csv_file, mode='r') as file:
         reader = csv.reader(file)
+        next(reader) # Skips the header row
         for row in reader:
             node_id = row[0].strip()
             x = int(row[1].strip())

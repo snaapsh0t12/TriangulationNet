@@ -26,7 +26,7 @@ import matplotlib.image as mpimg
 
 # Example Node class
 
-def update_nodes_from_cache(node1, node2, cache_file='cache'):
+def update_nodes_from_cache(node1, node2, cache_file='data/cache'):
     """
     Reads the cache file to determine which node last detected the target.
     Each line in the file is in the format: "id strength timestamp".
@@ -144,9 +144,9 @@ def plot_target(node1, node2, angle_degrees=45):
 
 while True:
     # Update node signal status based on the latest cache data
-    update_nodes_from_cache(node1, node2, cache_file='cache')
+    update_nodes_from_cache(node1, node2, cache_file='data/cache')
 
     # Plot the nodes and the computed target location
     plot_target(node1, node2, angle_degrees=225)
-    open('cache', 'w').close()
+    open('data/cache', 'w').close()
     time.sleep(1)

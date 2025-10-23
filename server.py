@@ -27,7 +27,7 @@ Functions:
 
 """
 
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, send_file, Response
 import hashlib, csv, time
 
 app = Flask(__name__)
@@ -37,7 +37,7 @@ toAdd=[]
 
 # Destroy the existing node database and cache
 #open('nodes.csv', 'w').close()
-open('cache', 'w').close()
+open('data/cache', 'w').close()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -54,8 +54,12 @@ def register():
 
     data = request.json
     id = data.get('id')
+    csv_data = csv.reader("data/nodes.csv", delimeter=",") # gets mac addresses from nodes.csv so we don't reregister
+    mac_addresses = []
+    for row in csv_data:
+        mac_addresses.append(row[0])
 
-    if id is not None and id not in toAdd:
+    if id is not None and id not in toAdd and id not in mac_addresses:
         toAdd.append(id)
         return "Added"
 
@@ -92,7 +96,7 @@ def register_final():
 
     # Write to the database
 
-    with open("nodes.csv", mode='a', newline='') as file:
+    with open("data/nodes.csv", mode='a', newline='') as file:
         writer = csv.writer(file)
         
         # Write the new row
@@ -100,7 +104,7 @@ def register_final():
 
     # Write to the cache
 
-    with open('cache', 'a') as file:
+    with open('data/cache', 'a') as file:
         file.write(f'{id} 0\n')
 
     return ''
@@ -123,8 +127,8 @@ def ping():
 
     # Write to the cache
 
-    with open("cache", "a") as file:
-        file.write(f"{id} {strength} {time.time()}\n")
+    with open("data/cache", "a") as file:
+        file.write(f"{id} {strength} {round(time.time())}\n")
     
     return "Accepted"
 
@@ -196,6 +200,23 @@ def notify():
     # The index webpage with the real time map of the network
     
     return render_template('notify.html')
+
+@app.route('/data', methods=['GET'])
+def data():
+    # Grabbing data csv
+    csv_data = open("data/coordinates.csv", "r").read()
+    response = Response(csv_data, content_type="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=data.csv"
+    return response
+
+@app.route('/nodes', methods=['GET'])
+def node_coords():
+    # Grabs the nodes.csv
+    # the data should be node#,x,y,range(m)
+    csv_data = open("data/nodes.csv", "r").read()
+    response = Response(csv_data, content_type="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=nodes.csv"
+    return response
 
 
 
