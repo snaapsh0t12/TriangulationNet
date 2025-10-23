@@ -5,6 +5,10 @@ const margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 615 - margin.left - margin.right,
         height = 375 - margin.top - margin.bottom;
 
+var data = "";
+
+// Coordinates on the paths
+
 // append the svg object to the body of the page
 const svg = d3.select("#container")
     .append("svg")
@@ -29,18 +33,18 @@ d3.csv("/nodes").then( function(data) {
 
 // Add X axis
 const x = d3.scaleLinear()
-.domain([0, 100])
-.range([ 0, width ]);
+    .domain([0, 100])
+    .range([ 0, width ]);
 svg.append("g")
-.attr("transform", `translate(0, ${height})`)
-.call(d3.axisBottom(x));
+    .attr("transform", `translate(0, ${height})`)
+    .call(d3.axisBottom(x));
 
 // Add Y axis
 const y = d3.scaleLinear()
-.domain([0, 100])
-.range([ height, 0]);
+    .domain([0, 100])
+    .range([ height, 0]);
 svg.append("g")
-.call(d3.axisLeft(y));
+    .call(d3.axisLeft(y));
 
 // Tooltip stuff
 const tooltip = d3.select("body").append("div")
@@ -56,6 +60,21 @@ const tooltip = d3.select("body").append("div")
     .style("color", "#ffffff")
     .style("transition", "opacity 0.1s ease-out");
 
+// Add range circles first
+svg.append('g')
+    .selectAll("rangeCircle")
+    .data(data)
+    .join("circle")
+    .attr("class", "range-circle")
+    .attr("cx", d => x(d.x))
+    .attr("cy", d => y(d.y))
+    .attr("r", d => 5) // makes it so it fits within the circles
+    .style("fill", "none")
+    .style("stroke", "#b36969")
+    .style("stroke-width", 1)
+    .style("fill", "#b36969")
+    .style("opacity", 0);
+
 // Add dots
 svg.append('g')
     .selectAll("dot")
@@ -69,12 +88,20 @@ svg.append('g')
         .on("mouseover", function (event, d) {
         tooltip
             .style("opacity", "1")
-            .html(`Name: ${d.nickname}<br>Mac Address: ${d.mac}<br>(${d.x}, ${d.y})`);  // customize this content!
+            .html(`Name: ${d.nickname}<br>Mac Address: ${d.mac}<br>(${d.x}, ${d.y})<br>Range: ${d.range}m`);  // customize this content!
         d3.select(this)
             .transition()
             .duration(150)
             .ease(d3.easeCubicOut)
             .attr("r", 7); // grow circle
+        
+        // Highlight range circle
+        d3.selectAll(".range-circle")
+            .filter(cd => cd === d)
+            .transition()
+            .duration(150)
+            .attr("r", d.range)
+            .style("opacity", 0.5);
         })
         .on("mousemove", function (event) {
             tooltip
@@ -82,13 +109,22 @@ svg.append('g')
                 .style("left", (event.pageX + 10) + "px");
             
         })
-        .on("mouseout", function () {
+        .on("mouseout", function (d) {
             tooltip.style("opacity", "0");
             d3.select(this)
-            .transition()
-            .ease(d3.easeCubicOut)
-            .duration(150)
-            .attr("r", 5); // grow circle
+                .transition()
+                .ease(d3.easeCubicOut)
+                .duration(150)
+                .attr("r", 5); // grow circle
+
+            // Hide range circle
+            d3.selectAll(".range-circle")
+                // .filter(cd => cd === d)
+                .transition()
+                .ease(d3.easeCubicOut)
+                .duration(150)
+                .style("opacity", 0)
+                .attr("r", 5);
         });
 
 // Define zoom behavior
