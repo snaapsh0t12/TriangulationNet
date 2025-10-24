@@ -93,7 +93,8 @@ svg.append('g')
             .transition()
             .duration(150)
             .ease(d3.easeCubicOut)
-            .attr("r", 7); // grow circle
+            .attr("r", 7)
+            .style("cursor", "default"); // grow circle
         
         // Highlight range circle
         d3.selectAll(".range-circle")
@@ -119,13 +120,76 @@ svg.append('g')
 
             // Hide range circle
             d3.selectAll(".range-circle")
-                // .filter(cd => cd === d)
                 .transition()
                 .ease(d3.easeCubicOut)
                 .duration(150)
                 .style("opacity", 0)
                 .attr("r", 5);
         });
+})
+
+// Plot the data of the tracked kiwibots
+d3.csv("/data").then( function(data) {
+
+    // Add X axis
+const x = d3.scaleLinear()
+    .domain([0, 100])
+    .range([ 0, width ]);
+    // Add Y axis
+const y = d3.scaleLinear()
+    .domain([0, 100])
+    .range([ height, 0]);
+
+// Tooltip stuff
+const tooltip = d3.select("body").append("div")
+    .attr("id", "kiwitooltip")
+    .style("position", "absolute")
+    .style("opacity", "0")
+    .style("background", "#4b3d5dff")
+    .style("border", "1px solid #ccc")
+    .style("padding", "6px")
+    .style("font-size", "12px")
+    .style("border-radius", "4px")
+    .style("pointer-events", "none")
+    .style("color", "#ffffff")
+    .style("transition", "opacity 0.1s ease-out");
+
+    // Add dots
+svg.append('g')
+    .selectAll("dot")
+    .data(data)
+    .join("circle")
+        .attr("class", "kiwicircle")
+        .attr("cx", function (d) { return x((d.x)); } )
+        .attr("cy", function (d) { return y(d.y); } )
+        .attr("r", 5)
+        .style("fill", "#476cc1ff")
+        .on("mouseover", function (event, d) {
+        tooltip
+            .style("opacity", "1")
+            .html(`Mac Address: ${d.mac}<br>(${d.x}, ${d.y})`);  // customize this content!
+        d3.select(this)
+            .transition()
+            .duration(150)
+            .ease(d3.easeCubicOut)
+            .attr("r", 7)
+            .style("cursor", "default"); // grow circle
+        })
+        .on("mousemove", function (event) {
+            tooltip
+                .style("top", (event.pageY + 10) + "px")
+                .style("left", (event.pageX + 10) + "px");
+            
+        })
+        .on("mouseout", function (d) {
+            tooltip.style("opacity", "0");
+            d3.select(this)
+                .transition()
+                .ease(d3.easeCubicOut)
+                .duration(150)
+                .attr("r", 5);
+        });
+});
 
 // Define zoom behavior
 const zoom = d3.zoom()
@@ -135,7 +199,3 @@ const zoom = d3.zoom()
     });
 
 svg.call(zoom);
-
-})
-
-
