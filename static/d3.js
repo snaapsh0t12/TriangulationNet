@@ -1,52 +1,35 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-// set the dimensions and margins of the graph
-const margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = 615 - margin.left - margin.right,
-        height = 375 - margin.top - margin.bottom;
+const margin = {top: 20, right: 20, bottom: 30, left: 40};
 
-var data = "";
+const container = d3.select("#d3-graph");
 
-// Coordinates on the paths
+// Ensure the container exists
+if (container.empty()) {
+    throw new Error("#d3-graph element not found");
+}
 
-// append the svg object to the body of the page
-const svg = d3.select("#container")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .attr("id", "dynamicImage")
-    // .call(d3.zoom().on("zoom", function () {
-    //     svg.attr("transform", d3.event.transform)
-    // }))
-    .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+// Use an existing SVG if the container is an <svg>, otherwise create one that fills the container
+let svgRoot;
+if (container.node().nodeName.toLowerCase() === "svg") {
+    svgRoot = container;
+    svgRoot.style("width", "100%").style("height", "100%");
+} else {
+    svgRoot = container.append("svg")
+        .attr("id", "d3-graph-svg")
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("font-size", "20px");
+}
 
-svg.append("image")
-    .attr("href", "/static/images/dark_map.png")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", width)
-    .attr("height", height);
+// Group that will be transformed by zoom & where we draw content
+let g = svgRoot.append("g").attr("class", "app-group");
 
-//Read the data
-d3.csv("/nodes").then( function(data) {
+// Make sure image/tooltips aren't duplicated if file is reloaded
+d3.select("#tooltip").remove();
+d3.select("#kiwitooltip").remove();
 
-// Add X axis
-const x = d3.scaleLinear()
-    .domain([0, 100])
-    .range([ 0, width ]);
-svg.append("g")
-    .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x));
-
-// Add Y axis
-const y = d3.scaleLinear()
-    .domain([0, 100])
-    .range([ height, 0]);
-svg.append("g")
-    .call(d3.axisLeft(y));
-
-// Tooltip stuff
+// Create tooltips (singletons)
 const tooltip = d3.select("body").append("div")
     .attr("id", "tooltip")
     .style("position", "absolute")
@@ -54,88 +37,217 @@ const tooltip = d3.select("body").append("div")
     .style("background", "#4b3d5dff")
     .style("border", "1px solid #ccc")
     .style("padding", "6px")
-    .style("font-size", "12px")
     .style("border-radius", "4px")
     .style("pointer-events", "none")
     .style("color", "#ffffff")
     .style("transition", "opacity 0.1s ease-out");
 
-// Add range circles first
-svg.append('g')
-    .selectAll("rangeCircle")
-    .data(data)
-    .join("circle")
-    .attr("class", "range-circle")
-    .attr("cx", d => x(d.x))
-    .attr("cy", d => y(d.y))
-    .attr("r", d => 5) // makes it so it fits within the circles
-    .style("fill", "none")
-    .style("stroke", "#b36969")
-    .style("stroke-width", 1)
-    .style("fill", "#b36969")
-    .style("opacity", 0);
+const kiwiTooltip = d3.select("body").append("div")
+    .attr("id", "kiwitooltip")
+    .style("position", "absolute")
+    .style("opacity", "0")
+    .style("background", "#4b3d5dff")
+    .style("border", "1px solid #ccc")
+    .style("padding", "6px")
+    .style("border-radius", "4px")
+    .style("pointer-events", "none")
+    .style("color", "#ffffff")
+    .style("transition", "opacity 0.1s ease-out");
 
-// Add dots
-svg.append('g')
-    .selectAll("dot")
-    .data(data)
-    .join("circle")
-        .attr("class", "circle")
-        .attr("cx", function (d) { return x(d.x); } )
-        .attr("cy", function (d) { return y(d.y); } )
-        .attr("r", 5)
-        .style("fill", "#b36969ff")
-        .on("mouseover", function (event, d) {
-        tooltip
-            .style("opacity", "1")
-            .html(`Name: ${d.nickname}<br>Mac Address: ${d.mac}<br>(${d.x}, ${d.y})<br>Range: ${d.range}m`);  // customize this content!
-        d3.select(this)
-            .transition()
-            .duration(150)
-            .ease(d3.easeCubicOut)
-            .attr("r", 7); // grow circle
-        
-        // Highlight range circle
-        d3.selectAll(".range-circle")
-            .filter(cd => cd === d)
-            .transition()
-            .duration(150)
-            .attr("r", d.range)
-            .style("opacity", 0.5);
-        })
-        .on("mousemove", function (event) {
-            tooltip
-                .style("top", (event.pageY + 10) + "px")
-                .style("left", (event.pageX + 10) + "px");
-            
-        })
-        .on("mouseout", function (d) {
-            tooltip.style("opacity", "0");
-            d3.select(this)
-                .transition()
-                .ease(d3.easeCubicOut)
-                .duration(150)
-                .attr("r", 5); // grow circle
+// Keep references to current drawn elements so we can redraw on resize
+let xScale, yScale, innerWidth, innerHeight;
 
-            // Hide range circle
-            d3.selectAll(".range-circle")
-                // .filter(cd => cd === d)
-                .transition()
-                .ease(d3.easeCubicOut)
-                .duration(150)
-                .style("opacity", 0)
-                .attr("r", 5);
+// Responsive render function
+function render() {
+    // measure container size
+    const rect = container.node().getBoundingClientRect();
+    const fullW = Math.max(200, rect.width);
+    const fullH = Math.max(200, rect.height);
+
+    // set viewBox to make svg content scale with container
+    svgRoot.attr("viewBox", `0 0 ${fullW} ${fullH}`)
+            .attr("preserveAspectRatio", "xMidYMid meet");
+
+    // compute inner usable size
+    innerWidth = Math.max(50, fullW - margin.left - margin.right);
+    innerHeight = Math.max(50, fullH - margin.top - margin.bottom);
+
+    // clear previous drawing group and recreate (keeps DOM simpler)
+    svgRoot.selectAll(".app-group").remove();
+    g = svgRoot.append("g").attr("class", "app-group").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // append background image sized to inner drawing area so it always fits perfectly
+    g.append("image")
+        .attr("href", "/static/images/dark_map.png")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", innerWidth)
+        .attr("height", innerHeight)
+        .attr("preserveAspectRatio", "xMidYMid slice");
+
+    // create scales based on inner dimensions
+    xScale = d3.scaleLinear().domain([0, 200]).range([0, innerWidth]);
+    yScale = d3.scaleLinear().domain([0, 100]).range([innerHeight, 0]);
+
+    // axes
+    const xAxis = d3.axisBottom(xScale).ticks(6).tickSizeOuter(0);
+    const yAxis = d3.axisLeft(yScale).ticks(6).tickSizeOuter(0);
+
+    // axes groups (positioned relative to g)
+    g.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0, ${innerHeight})`)
+        .style("font-size", "20px")
+        .call(xAxis);
+
+    g.append("g")
+        .attr("class", "y-axis")
+        .style("font-size", "20px")
+        .call(yAxis);
+
+    // load and draw nodes and tracked data
+    drawNodes();
+    drawTracked();
+}
+
+// draw nodes (reads from /nodes CSV)
+function drawNodes() {
+    d3.csv("/nodes").then(function(data) {
+        // parse numeric values gently
+        data.forEach(d => {
+            d.x = +d.x || 0;
+            d.y = +d.y || 0;
+            d.range = +d.range || 5;
         });
 
-// Define zoom behavior
+        // range circles
+        const ranges = g.selectAll("circle.range-circle").data(data, d => d.mac || d.id || JSON.stringify(d));
+        ranges.join(
+            enter => enter.append("circle")
+                .attr("class", "range-circle")
+                .attr("cx", d => xScale(d.x))
+                .attr("cy", d => yScale(d.y))
+                .attr("r", d => 7)
+                .style("fill", "#b36969")
+                .style("stroke", "#b36969")
+                .style("stroke-width", 1)
+                .style("opacity", 0),
+            update => update
+                .transition().duration(200)
+                .attr("cx", d => xScale(d.x))
+                .attr("cy", d => yScale(d.y))
+                .attr("r", d => 7),
+            exit => exit.remove()
+        );
+
+        // node dots
+        const dots = g.selectAll("circle.node-dot").data(data, d => d.mac || d.id || JSON.stringify(d));
+        dots.join(
+            enter => enter.append("circle")
+                .attr("class", "node-dot")
+                .attr("cx", d => xScale(d.x))
+                .attr("cy", d => yScale(d.y))
+                .attr("r", 7)
+                .style("fill", "#b36969ff")
+                .on("mouseover", function(event, d) {
+                    tooltip.style("opacity", "1")
+                        .html(`Name: ${d.nickname || "-"}<br>Mac: ${d.mac || d.id || "-"}<br>(${d.x}, ${d.y})<br>Range: ${d.range}m`);
+                    d3.select(this).transition().duration(120).attr("r", 7);
+                    // highlight matching range circle
+                    g.selectAll("circle.range-circle")
+                        .filter(cd => cd === d)
+                        .transition().duration(120)
+                        .attr("r", d.range)
+                        .style("opacity", 0.5);
+                })
+                .on("mousemove", function(event) {
+                    tooltip.style("top", (event.pageY + 10) + "px")
+                            .style("left", (event.pageX + 10) + "px");
+                })
+                .on("mouseout", function(event, d) {
+                    tooltip.style("opacity", "0");
+                    d3.select(this).transition().duration(120).attr("r", 5);
+                    g.selectAll("circle.range-circle")
+                        .transition().duration(120)
+                        .attr("r", 7)
+                        .style("opacity", 0);
+                }),
+            update => update
+                .transition().duration(200)
+                .attr("cx", d => xScale(d.x))
+                .attr("cy", d => yScale(d.y)),
+            exit => exit.remove()
+        );
+    }).catch(err => {
+        console.error("Failed to load /nodes CSV:", err);
+    });
+}
+
+// draw tracked data (reads from /data CSV)
+function drawTracked() {
+    d3.csv("/data").then(function(data) {
+        data.forEach(d => {
+            d.x = +d.x || 0;
+            d.y = +d.y || 0;
+        });
+
+        const dots = g.selectAll("circle.kiwi-dot").data(data, d => d.mac || JSON.stringify(d));
+        dots.join(
+            enter => enter.append("circle")
+                .attr("class", "kiwi-dot")
+                .attr("cx", d => xScale(d.x))
+                .attr("cy", d => yScale(d.y))
+                .attr("r", 7)
+                .style("fill", "#476cc1ff")
+                .on("mouseover", function(event, d) {
+                    kiwiTooltip.style("opacity", "1")
+                        .html(`Mac Address: ${d.mac || "-"}<br>(${d.x}, ${d.y})`);
+                    d3.select(this).transition().duration(120).attr("r", 10);
+                })
+                .on("mousemove", function(event) {
+                    kiwiTooltip.style("top", (event.pageY + 10) + "px")
+                            .style("left", (event.pageX + 10) + "px");
+                })
+                .on("mouseout", function() {
+                    kiwiTooltip.style("opacity", "0");
+                    d3.select(this).transition().duration(120).attr("r", 7);
+                }),
+            update => update
+                .transition().duration(200)
+                .attr("cx", d => xScale(d.x))
+                .attr("cy", d => yScale(d.y)),
+            exit => exit.remove()
+        );
+    }).catch(err => {
+        console.error("Failed to load /data CSV:", err);
+    });
+}
+
+// zoom behavior: zoom transforms the inner group (g)
 const zoom = d3.zoom()
-    .scaleExtent([0.5, 10]) // min and max zoom levels
+    .scaleExtent([0.5, 10])
     .on("zoom", (event) => {
-        svg.attr("transform", event.transform); // apply zoom transform to group
+        // apply transform to the drawing group (translate + scale)
+        svgRoot.selectAll(".app-group").attr("transform", `translate(${margin.left},${margin.top}) ${event.transform}`);
     });
 
-svg.call(zoom);
+// Attach zoom to the SVG root so scroll/drag works
+svgRoot.call(zoom);
 
-})
+// initial render
+render();
 
+// re-render on window resize (debounced)
+let resizeTimer;
+function handleResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        render();
+    }, 120);
+}
+window.addEventListener("resize", handleResize);
 
+// expose a reload function for external UI controls
+window.reloadD3 = function() {
+    render();
+};

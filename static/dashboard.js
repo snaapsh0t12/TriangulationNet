@@ -86,7 +86,7 @@ function addFormIfUnique(title) {
     container.appendChild(form);
 }
 
-setInterval(fetchData, 1000); // Check every 1 second
+// setInterval(fetchData, 1000); // Check every 1 second
 
 
 function toggleForm(formId) {
