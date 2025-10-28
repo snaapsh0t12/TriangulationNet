@@ -27,7 +27,7 @@ Functions:
 
 """
 
-from flask import Flask, request, render_template, jsonify, send_file, Response
+from flask import Flask, request, render_template, jsonify, send_file, Response, send_from_directory
 import hashlib, csv, time
 
 app = Flask(__name__)
@@ -217,6 +217,15 @@ def node_coords():
     response = Response(csv_data, content_type="text/csv")
     response.headers["Content-Disposition"] = "attachment; filename=nodes.csv"
     return response
+
+@app.route('/static/images/<path:filename>')
+def static_images(filename):
+    return send_from_directory('static/images', filename)
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
+
 
 
 

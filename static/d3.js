@@ -78,7 +78,7 @@ function render() {
 
     // append background image sized to inner drawing area so it always fits perfectly
     g.append("image")
-        .attr("href", "/static/images/dark_map.png")
+        .attr("href", "/static/images/satellite851x517.png") // Current image spans about 851x517 feet
         .attr("x", 0)
         .attr("y", 0)
         .attr("width", innerWidth)
@@ -86,8 +86,8 @@ function render() {
         .attr("preserveAspectRatio", "xMidYMid slice");
 
     // create scales based on inner dimensions
-    xScale = d3.scaleLinear().domain([0, 200]).range([0, innerWidth]);
-    yScale = d3.scaleLinear().domain([0, 100]).range([innerHeight, 0]);
+    xScale = d3.scaleLinear().domain([0, 851]).range([0, innerWidth]); 
+    yScale = d3.scaleLinear().domain([0, 517]).range([innerHeight, 0]);
 
     // axes
     const xAxis = d3.axisBottom(xScale).ticks(6).tickSizeOuter(0);
