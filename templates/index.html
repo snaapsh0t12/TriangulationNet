@@ -1,62 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/css/uikit.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.12/dist/js/uikit-icons.min.js"></script>
-    <title>Triangulation Network</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TriangulationNet Dashboard</title>
+
     <link rel="stylesheet" href="/static/dashboard.css">
 </head>
-
 <body>
+    <header class="topbar">
+        <div class="brand">TriangulationNet</div>
+        <nav class="top-nav">
+            <button class="tab-btn" data-tab="overview" onclick="showTab('overview')">Overview</button>
+            <button class="tab-btn" data-tab="nodes" onclick="showTab('nodes')">Nodes</button>
+            <button class="tab-btn" data-tab="add" onclick="showTab('add')">Add Node</button>
+            <button class="tab-btn" data-tab="config" onclick="showTab('config')">Config</button>
+            <button class="tab-btn" data-tab="notify" onclick="showTab('notify')">Notifications</button>
+        </nav>
+    </header>
 
-    <style> /* For the zoomable image*/
-    </style>
-    
+    <main class="layout">
+        <!-- Left: Main visualization -->
+        <section class="main-panel" id="overview-panel">
+            <div class="panel-title">Network Map</div>
+            <div id="imageContainer" class="image-container">
 
-    <div class="uk-grid uk-height-1-1 uk-width-1-1 everything" uk-grid>
-        <div class="uk-width-1-2 uk-height-1-1 left">
-            <div class="image-container uk-text-center" id="imageContainer">
-                <!-- <img id="dynamicImage" src="/static/images/image.png" alt="Dynamic Image"> -->
-            <div id="container"></div>
+                <!-- D3 will attach to this svg or you can use an image with id="dynamicImage" -->
+                <svg id="d3-graph" width="100%" height="100%" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg>
+                <!--<img id="dynamicImage" alt="" style="display:none;"-->
             </div>
-        </div>
-
-        <div class="right-container uk-width-1-2 uk-height-1-1">
-            <div class="edit-form-container top-right uk-text-center uk-height-1-2">
-                <button class="uk-button uk-button-default" onclick="toggleForm('form1')">Change Config</button>
-                <button class="uk-button uk-button-default" onclick="toggleForm('form2')">Edit Node Database</button>
-
-                <form id="form1" class="edit-form">
-                    <h3>Form 1</h3>
-                    <input class="uk-input" type="text" placeholder="Your Name" required>
-                    <input class="uk-input" type="text" placeholder="Your Name" required>
-                    <button class="uk-button uk-button-primary" type="submit">Submit</button>
-                </form>
-
-                <form id="form2" class="edit-form">
-                    <h3>Form 2</h3>
-                    <input class="uk-input" type="email" placeholder="Your Email" required>
-                    <input class="uk-input" type="text" placeholder="Subject" required>
-                    <button class="uk-button uk-button-primary" type="submit">Submit</button>
-                </form>
+            <div class="panel-footer">
+                <small>Realtime node/target positions — pan/zoom with D3 controls</small>
             </div>
-        
+        </section>
 
-            <div class="uk-height-1-2 bottom-right content">
-                <div class="uk-text-center" id="add-nodes-container"></div>
+        <!-- Right: Tabs and forms -->
+        <aside class="sidebar">
+            <div class="sidebar-top top-right">
+                <div class="tab-content active" id="overview">
+                    <h3>Overview</h3>
+                    <p>Live graph and quick stats.</p>
+                </div>
+
+                <div class="tab-content" id="nodes">
+                    <h3>Nodes</h3>
+                    <div class="nodes-list">
+                        <button class="btn small" onclick="fetch('/nodes').then(r=>r.text()).then(t=>{ const w = window.open(); w.document.body.innerText = t; })">Download nodes.csv</button>
+                        <div id="nodes-table">Loading nodes...</div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="add">
+                    <h3>Add / Register Nodes</h3>
+                    <div id="add-nodes-container">
+                        <!-- JS will insert registration forms here -->
+                        <p class="muted">Waiting for new nodes to register...</p>
+                    </div>
+
+                    <form id="manual-add" class="edit-form" onsubmit="manualAdd(event)">
+                        <h4>Manual Add</h4>
+                        <label>Node ID</label>
+                        <input name="id" placeholder="node id (mac or uuid)" required>
+                        <label>Coordinates (x,y)</label>
+                        <input name="coords" placeholder="e.g. 100,200" required>
+                        <div class="actions">
+                            <button class="btn" type="submit">Add Node</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-content" id="config">
+                    <h3>Config</h3>
+                    <form id="config-form" onsubmit="configSave(event)">
+                        <label>Target address</label>
+                        <input name="target_address" placeholder="target address">
+                        <label>Clock delay (s)</label>
+                        <input name="clock_delay" type="number" min="0" step="1">
+                        <div class="actions">
+                            <button type="submit" class="btn">Save Config</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-content" id="notify">
+                    <h3>Notifications</h3>
+                    <div id="notify-list">No notifications yet.</div>
+                </div>
             </div>
-            
-        </div>
-    </div>
 
-    <script src="/static/dashboard.js"></script>
-    
+            <div class="sidebar-bottom bottom-right">
+                <div class="small-panel">
+                    <h4>Quick Controls</h4>
+                    <button class="btn small" onclick="reloadGraph()">Reload Graph</button>
+                    <button class="btn small" onclick="downloadData()">Download Data</button>
+                </div>
+                <div class="small-panel">
+                    <h4>Debug</h4>
+                    <pre id="debug" class="debug"></pre>
+                </div>
+            </div>
+        </aside>
+    </main>
 
+    <footer class="footer">
+        <small>TriangulationNet — Central Server Dashboard</small>
+    </footer>
 
+    <script type="module" src="/static/d3.js" defer></script>
+    <script src="/static/dashboard.js" defer></script>
+    <script>
+        // Small tab + helper UI logic
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(ct => ct.classList.remove('active'));
+            const el = document.getElementById(id);
+            if (el) el.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('selected', b.dataset.tab === id));
+        }
 
+        async function manualAdd(e){
+            e.preventDefault();
+            const form = e.target;
+            const id = form.id.value.trim();
+            const coords = form.coords.value.trim();
+            if(!id || !coords) return;
+            try {
+                await fetch('/register_final', {
+                    method: 'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({id:id, data: coords})
+                });
+                form.reset();
+                alert('Added');
+            } catch(err){
+                console.error(err);
+                alert('Failed to add');
+            }
+        }
+
+        async function configSave(e){
+            e.preventDefault();
+            const form = e.target;
+            const params = new URLSearchParams({
+                target_address: form.target_address.value,
+                clock_delay: form.clock_delay.value
+            });
+            await fetch('/config_change?'+params.toString(), { method: 'POST' });
+            alert('Config saved (server handler must be implemented)');
+        }
+
+        function reloadGraph(){
+            // user can add d3-specific reload logic here
+            if (window.reloadD3) window.reloadD3();
+        }
+
+        function downloadData(){
+            location.href = '/data';
+        }
+
+        // Load nodes list for UI (simple)
+        async function loadNodes(){
+            try {
+                const text = await fetch('/nodes').then(r=>r.text());
+                const rows = text.trim().split('\n').filter(Boolean).map(r => r.split(','));
+                const container = document.getElementById('nodes-table');
+                container.innerHTML = '';
+                const table = document.createElement('table');
+                table.className = 'nodes-table';
+                const header = document.createElement('tr');
+                ['ID','X','Y'].forEach(h => { const th = document.createElement('th'); th.textContent = h; header.appendChild(th); });
+                table.appendChild(header);
+                rows.forEach(r => {
+                    const tr = document.createElement('tr');
+                    r.forEach(c => { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+                    table.appendChild(tr);
+                });
+                container.appendChild(table);
+            } catch(e){
+                document.getElementById('nodes-table').innerText = 'Failed to load nodes';
+            }
+        }
+
+        // start
+        document.addEventListener('DOMContentLoaded', ()=> {
+            showTab('overview');
+            loadNodes();
+        });
+    </script>
 </body>
-<script type="module" src="/static/d3.js"></script>
 </html>
