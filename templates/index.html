@@ -76,6 +76,11 @@
                         <input name="target_address" placeholder="target address">
                         <label>Clock delay (s)</label>
                         <input name="clock_delay" type="number" min="0" step="1">
+                        <label>Units</label>
+                        <select name="units">
+                            <option value="m">Meters (m)</option>
+                            <option value="ft">Feet (ft)</option>
+                        </select>
                         <div class="actions">
                             <button type="submit" class="btn">Save Config</button>
                         </div>
@@ -115,6 +120,7 @@
             const el = document.getElementById(id);
             if (el) el.classList.add('active');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('selected', b.dataset.tab === id));
+            localStorage.setItem('selectedTab', id); // Save current tab
         }
 
         async function manualAdd(e){
@@ -182,7 +188,8 @@
 
         // start
         document.addEventListener('DOMContentLoaded', ()=> {
-            showTab('overview');
+            const savedTab = localStorage.getItem('selectedTab') || 'overview';
+            showTab(savedTab);
             loadNodes();
         });
     </script>
