@@ -4,6 +4,13 @@ const margin = {top: 20, right: 20, bottom: 30, left: 40};
 
 const container = d3.select("#d3-graph");
 
+var nodeColor = "#eb3131ff";
+var kiwiBotColor = "#476cc1ff";
+var tooltipColor = "#3a4e7de0";
+
+var scaleX = 851; // Scale based on image in feet
+var scaleY = 517;
+
 // Ensure the container exists
 if (container.empty()) {
     throw new Error("#d3-graph element not found");
@@ -34,7 +41,7 @@ const tooltip = d3.select("body").append("div")
     .attr("id", "tooltip")
     .style("position", "absolute")
     .style("opacity", "0")
-    .style("background", "#4b3d5dff")
+    .style("background", tooltipColor)
     .style("border", "1px solid #ccc")
     .style("padding", "6px")
     .style("border-radius", "4px")
@@ -46,7 +53,7 @@ const kiwiTooltip = d3.select("body").append("div")
     .attr("id", "kiwitooltip")
     .style("position", "absolute")
     .style("opacity", "0")
-    .style("background", "#4b3d5dff")
+    .style("background", tooltipColor)
     .style("border", "1px solid #ccc")
     .style("padding", "6px")
     .style("border-radius", "4px")
@@ -86,12 +93,12 @@ function render() {
         .attr("preserveAspectRatio", "xMidYMid slice");
 
     // create scales based on inner dimensions
-    xScale = d3.scaleLinear().domain([0, 851]).range([0, innerWidth]); 
-    yScale = d3.scaleLinear().domain([0, 517]).range([innerHeight, 0]);
+    xScale = d3.scaleLinear().domain([0, scaleX]).range([0, innerWidth]); 
+    yScale = d3.scaleLinear().domain([0, scaleY]).range([innerHeight, 0]);
 
     // axes
-    const xAxis = d3.axisBottom(xScale).ticks(6).tickSizeOuter(0);
-    const yAxis = d3.axisLeft(yScale).ticks(6).tickSizeOuter(0);
+    const xAxis = d3.axisBottom(xScale).ticks(Math.round(scaleX/100)).tickSizeOuter(0);
+    const yAxis = d3.axisLeft(yScale).ticks(Math.round(scaleY/100)).tickSizeOuter(0);
 
     // axes groups (positioned relative to g)
     g.append("g")
@@ -127,16 +134,16 @@ function drawNodes() {
                 .attr("class", "range-circle")
                 .attr("cx", d => xScale(d.x))
                 .attr("cy", d => yScale(d.y))
-                .attr("r", d => 7)
-                .style("fill", "#b36969")
-                .style("stroke", "#b36969")
+                .attr("r", d => 10)
+                .style("fill", nodeColor)
+                .style("stroke", nodeColor)
                 .style("stroke-width", 1)
                 .style("opacity", 0),
             update => update
                 .transition().duration(200)
                 .attr("cx", d => xScale(d.x))
                 .attr("cy", d => yScale(d.y))
-                .attr("r", d => 7),
+                .attr("r", d => 10),
             exit => exit.remove()
         );
 
@@ -147,16 +154,16 @@ function drawNodes() {
                 .attr("class", "node-dot")
                 .attr("cx", d => xScale(d.x))
                 .attr("cy", d => yScale(d.y))
-                .attr("r", 7)
-                .style("fill", "#b36969ff")
+                .attr("r", 10)
+                .style("fill", nodeColor)
                 .on("mouseover", function(event, d) {
                     tooltip.style("opacity", "1")
-                        .html(`Name: ${d.nickname || "-"}<br>Mac: ${d.mac || d.id || "-"}<br>(${d.x}, ${d.y})<br>Range: ${d.range}m`);
-                    d3.select(this).transition().duration(120).attr("r", 7);
+                        .html(`Name: ${d.nickname || "-"}<br>Mac: ${d.mac || d.id || "-"}<br>(${d.x}, ${d.y})<br>Range: ${d.range}ft`); // Show specific information for each node
+                    d3.select(this).transition().duration(120).attr("r", 15);
                     // highlight matching range circle
                     g.selectAll("circle.range-circle")
                         .filter(cd => cd === d)
-                        .transition().duration(120)
+                        .transition().ease(d3.easeCubic).duration(200)
                         .attr("r", d.range)
                         .style("opacity", 0.5);
                 })
@@ -166,10 +173,10 @@ function drawNodes() {
                 })
                 .on("mouseout", function(event, d) {
                     tooltip.style("opacity", "0");
-                    d3.select(this).transition().duration(120).attr("r", 5);
+                    d3.select(this).transition().duration(120).attr("r", 10);
                     g.selectAll("circle.range-circle")
-                        .transition().duration(120)
-                        .attr("r", 7)
+                        .transition().ease(d3.easeCubic).duration(200)
+                        .attr("r", 10)
                         .style("opacity", 0);
                 }),
             update => update
@@ -183,7 +190,7 @@ function drawNodes() {
     });
 }
 
-// draw tracked data (reads from /data CSV)
+// draw tracked kiwibot data (reads from /data CSV)
 function drawTracked() {
     d3.csv("/data").then(function(data) {
         data.forEach(d => {
@@ -197,12 +204,12 @@ function drawTracked() {
                 .attr("class", "kiwi-dot")
                 .attr("cx", d => xScale(d.x))
                 .attr("cy", d => yScale(d.y))
-                .attr("r", 7)
-                .style("fill", "#476cc1ff")
+                .attr("r", 10)
+                .style("fill", kiwiBotColor)
                 .on("mouseover", function(event, d) {
                     kiwiTooltip.style("opacity", "1")
                         .html(`Mac Address: ${d.mac || "-"}<br>(${d.x}, ${d.y})`);
-                    d3.select(this).transition().duration(120).attr("r", 10);
+                    d3.select(this).transition().duration(120).attr("r", 15);
                 })
                 .on("mousemove", function(event) {
                     kiwiTooltip.style("top", (event.pageY + 10) + "px")
@@ -210,7 +217,7 @@ function drawTracked() {
                 })
                 .on("mouseout", function() {
                     kiwiTooltip.style("opacity", "0");
-                    d3.select(this).transition().duration(120).attr("r", 7);
+                    d3.select(this).transition().duration(120).attr("r", 10);
                 }),
             update => update
                 .transition().duration(200)

@@ -1,7 +1,7 @@
 mac,x,y,range,nickname
-a8:3b:76:72:df,40,35,164,laptop
-e8:9c:25:78:f6:99,30,40,164,desktop
-node1,50,40,164,node1
-node2,3,6,164,node2
-node4,6,6,164,node3
-node5,9,6,164,node4
+a8:3b:76:72:df,500,250,164,laptop
+e8:9c:25:78:f6:99,450,300,164,desktop
+node1,100,200,164,node1
+node2,300,100,164,node2
+node4,400,325,164,node3
+node5,600,192,164,node4
