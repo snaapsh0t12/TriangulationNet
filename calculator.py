@@ -88,20 +88,6 @@ def possible_coordinates(detecting_nodes, csv_file='data/nodes.csv'):
         print(x_coords, y_coords)
         plt.scatter(x_coords, y_coords, color='red', marker='x', label='Possible Coordinates')
 
-    plt.xlim(-20, 100)  # Adjust limits as necessary
-    plt.ylim(-20, 40)  # Adjust limits as necessary
-    plt.title('Target Triangulation')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.axhline(0, color='black', linewidth=0.5, ls='--')
-    plt.axvline(0, color='black', linewidth=0.5, ls='--')
-    plt.grid(color='gray', linestyle='--', linewidth=0.5)
-    #plt.legend() #Enable this for the legend
-    plt.savefig('static/images/image.png')
-    plt.gca().set_aspect('equal', adjustable='box')
-    #plt.show()
-    plt.close()
-
     if detected_coordinates is None:
         return None
     else:
