@@ -120,7 +120,7 @@ function render() {
 // draw nodes (reads from /nodes CSV)
 function drawNodes() {
     d3.csv("/nodes").then(function(data) {
-        // parse numeric values gently
+        // parse numeric values
         data.forEach(d => {
             d.x = +d.x || 0;
             d.y = +d.y || 0;

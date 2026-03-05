@@ -1,0 +1,14 @@
+profiles:
+  profile-1772727930444:
+    fqbn: esp32:esp32:nodemcu-32s:UploadSpeed=115200,FlashFreq=80,DebugLevel=none,EraseFlash=none
+    platforms:
+      - platform: esp32:esp32 (3.3.7)
+    programmer: esptool
+    port: /dev/ttyUSB0
+    port_config:
+      baudrate: "115200"
+      lineEnding: "\r\n"
+      bits: "8"
+      parity: none
+      stop_bits: one
+default_profile: profile-1772727930444
