@@ -1,0 +1,105 @@
+#include <WiFi.h>
+#include <Regexp.h>
+#include <painlessMesh.h>
+#include <ArduinoJson.h>
+
+// using namespace alteriom;
+
+#define NODE_ID 1
+
+#define MESH_PREFIX     "KiwiBotTracking"
+#define MESH_PASSWORD   "GoBlugolds"
+#define MESH_PORT       5555
+
+Scheduler userScheduler;
+painlessMesh mesh;
+
+
+
+const char* ssidPattern = "Aiden*";  // regex for SSIDs
+unsigned long lastScanMs = 0;
+const unsigned long scanIntervalMs = 3000;
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    // Print reset reason to diagnose crash loops
+    esp_reset_reason_t reason = esp_reset_reason();
+    Serial.printf("Reset reason: %d\n", reason);
+
+    WiFi.mode(WIFI_STA);
+    // WiFi.begin(ROUTER_SSID, ROUTER_PASSWORD);
+
+    uint8_t routerChannel = 1;
+    unsigned long startMs = millis();
+    // while (WiFi.status() != WL_CONNECTED && (millis() - startMs) < 10000) {
+    //     delay(200);
+    // }
+
+    mesh.setDebugMsgTypes(ERROR | STARTUP | CONNECTION);
+    mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT, WIFI_STA, routerChannel);
+    mesh.setContainsRoot(true);
+    mesh.onReceive(&receivedCallback);
+
+}
+
+void loop() {
+    mesh.update();
+
+    // Kick off an async scan every scanIntervalMs
+    if (millis() - lastScanMs >= scanIntervalMs) {
+        lastScanMs = millis();
+        int status = WiFi.scanComplete();
+        if (status == WIFI_SCAN_FAILED) {
+            // No scan running — start a new async one (non-blocking)
+            WiFi.scanNetworks(true, true);
+            Serial.println("Scan started...");
+        }
+    }
+
+    // Check if an async scan has completed
+    int n = WiFi.scanComplete();
+    if (n < 0) {
+        return; // WIFI_SCAN_RUNNING or WIFI_SCAN_FAILED — not ready yet
+    }
+
+    MatchState ms;
+    for (int i = 0; i < n; i++) {
+        String ssid = WiFi.SSID(i);
+        std::string ssidStr = ssid.c_str();
+
+        ms.Target((char*)ssidStr.c_str());
+        if (ms.Match(ssidPattern) > 0) {
+            int rssi = WiFi.RSSI(i);
+            uint8_t* bssid = WiFi.BSSID(i);
+
+            char macStr[18];
+            sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X",
+                    bssid[0], bssid[1], bssid[2],
+                    bssid[3], bssid[4], bssid[5]);
+
+            Serial.printf("MATCHED: SSID=%s, MAC=%s, RSSI=%d\n",
+                          ssid.c_str(), macStr, rssi);
+
+            JsonDocument doc;
+            doc["ssid"] = ssid.c_str();
+            doc["rssi"] = rssi;
+            doc["mac"] = macStr;
+            doc["node_id"] = NODE_ID;
+            mesh.sendBroadcast(doc.as<String>());
+        }
+    }
+    WiFi.scanDelete();
+}
+
+void receivedCallback(uint32_t from, String& msg) {
+    JsonDocument doc;  // ArduinoJson v7
+    deserializeJson(doc, msg);
+    
+    if (doc["type"] == 200) {
+        String out;
+        serializeJson(doc, out);
+        Serial.println(out);
+    }
+}

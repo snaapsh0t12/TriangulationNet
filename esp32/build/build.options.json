@@ -1,9 +1,0 @@
-{
-  "additionalFiles": "../../..,../../..",
-  "compiler.optimization_flags": "-Os",
-  "customBuildProperties": "",
-  "fqbn": "esp32:esp32:nodemcu-32s:UploadSpeed=115200,FlashFreq=80,DebugLevel=none,EraseFlash=none",
-  "hardwareFolders": "/home/aiden/.arduino15/packages/esp32/hardware/esp32/3.3.7,/home/aiden/.arduino15/packages/esp32/hardware/esp32/3.3.7",
-  "otherLibrariesFolders": "/home/aiden/Documents/Arduino/libraries",
-  "sketchLocation": "/home/aiden/Documents/GitHub/TriangulationNet/esp32"
-}
