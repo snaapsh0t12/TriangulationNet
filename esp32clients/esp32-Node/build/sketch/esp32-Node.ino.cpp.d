@@ -143,18 +143,6 @@
  /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/hal/cpu_ll.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/io_pin_remap.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Arduino.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessMesh.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessTaskOptions.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/configuration.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessTaskOptions.h \
- /home/aiden/Documents/Arduino/libraries/TaskScheduler/src/TaskSchedulerDeclarations.h \
- /home/aiden/Documents/Arduino/libraries/ArduinoJson/src/ArduinoJson.h \
- /home/aiden/Documents/Arduino/libraries/ArduinoJson/src/ArduinoJson.hpp \
- /home/aiden/Documents/Arduino/libraries/ArduinoJson/src/ArduinoJson/Configuration.hpp \
- /home/aiden/Documents/Arduino/libraries/Async_TCP/src/AsyncTCP.h \
- /home/aiden/Documents/Arduino/libraries/Async_TCP/src/AsyncTCPVersion.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/pbuf.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/err.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFi.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Print.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiType.h \
@@ -203,39 +191,4 @@
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiClient.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiServer.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiUdp.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkUdp.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/esp_mac.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessMeshSTA.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/mesh.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/configuration.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/connection.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/buffer.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/logger.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/ntp.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/callback.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/protocol.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/router.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/layout.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/plugin.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/tcp.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/ota.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/base64.hpp \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Update/src/Update.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/MD5Builder.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_rom/include/esp_rom_md5.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/HashBuilder.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/HEXBuilder.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/SPIFFS/src/SPIFFS.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/FS/src/FS.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/arduino/wifi.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessMeshSTA.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/mesh.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/ota.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/buffer.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/layout.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/logger.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/ntp.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/plugin.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/protocol.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/router.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/tcp.hpp
+ /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkUdp.h

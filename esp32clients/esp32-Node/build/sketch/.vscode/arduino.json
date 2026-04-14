@@ -1,7 +1,7 @@
 #line 1 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/.vscode/arduino.json"
 {
-  "port": "/dev/ttyUSB0",
-  "configuration": "UploadSpeed=115200,FlashFreq=40,DebugLevel=warn,EraseFlash=all",
+  "port": "/dev/ttyUSB1",
+  "configuration": "UploadSpeed=115200,FlashFreq=40,DebugLevel=error,EraseFlash=all",
   "output": "build",
   "board": "esp32:esp32:nodemcu-32s",
   "programmer": "esptool",
@@ -11,7 +11,7 @@
   "compile_profile": "profile-1772727930444",
   "monitorPortSettings": {
     "settings": {
-      "port": "/dev/ttyUSB0",
+      "port": "/dev/ttyUSB1",
       "baudRate": 115200,
       "lineEnding": "\r\n",
       "dataBits": 8,

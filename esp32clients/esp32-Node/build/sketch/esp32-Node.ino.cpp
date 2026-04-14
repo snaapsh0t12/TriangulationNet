@@ -1,97 +1,70 @@
 #include <Arduino.h>
 #line 1 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
-#include "painlessMesh.h"
+/*
+ * wCTF Random SSID Generator for ESP32
+ *
+ * On each boot, generates a random 3-character suffix (A-Z, 0-9)
+ * and brings up a Wi-Fi access point named wCTF-XXX.
+ *
+ * Board: ESP32 (any variant)
+ * Framework: Arduino
+ */
 
-#define MESH_PREFIX     "KiwiBotTracking"
-#define MESH_PASSWORD   "GoBlugolds"
-#define MESH_PORT       5555
+#include <WiFi.h>
 
-Scheduler userScheduler;
-painlessMesh mesh;
+// Characters allowed in the suffix: uppercase letters + digits
+static const char CHARSET[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+static const int  CHARSET_LEN = sizeof(CHARSET) - 1; // exclude null terminator
 
-// Sensor simulation
-float temperature = 22.5;
-float humidity = 65.0;
-uint32_t sensorId = 1001;
-unsigned long lastHeartbeatMs = 0;
+// AP password — set to "" for an open network
+static const char *AP_PASSWORD = "";
 
-// Task to send sensor data every 30 seconds
-Task taskSendSensor(30000, TASK_FOREVER, [](){
-    // Simulate sensor readings with some variation
-    temperature += random(-10, 10) / 10.0;
-    humidity += random(-50, 50) / 10.0;
-    
-    // Keep values in reasonable ranges
-    temperature = constrain(temperature, 15.0, 35.0);
-    humidity = constrain(humidity, 30.0, 90.0);
-    
-    // Create JSON message
-    String msg = "{";
-    msg += "\"type\":\"sensor\",";
-    msg += "\"nodeId\":" + String(mesh.getNodeId()) + ",";
-    msg += "\"sensorId\":" + String(sensorId) + ",";
-    msg += "\"temperature\":" + String(temperature, 1) + ",";
-    msg += "\"humidity\":" + String(humidity, 1) + ",";
-    msg += "\"timestamp\":" + String(mesh.getNodeTime());
-    msg += "}";
-    
-    mesh.sendBroadcast(msg);
-    Serial.printf("Sent sensor data: T=%.1f degC, H=%.1f%%\n", temperature, humidity);
-});
-
-#line 40 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
-void receivedCallback(uint32_t from, String &msg);
-#line 51 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
-void newConnectionCallback(uint32_t nodeId);
-#line 55 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
-void changedConnectionCallback();
-#line 60 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+#line 20 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
 void setup();
-#line 77 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+#line 60 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
 void loop();
-#line 40 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
-void receivedCallback(uint32_t from, String &msg) {
-    Serial.printf("Sensor Node: Received from %u: %s\n", from, msg.c_str());
-    
-    // Sensor nodes can respond to commands
-    if (msg.indexOf("\"command\":\"read_sensor\"") > 0) {
-        // Force immediate sensor reading
-        taskSendSensor.forceNextIteration();
-        Serial.println("Forced sensor reading requested");
-    }
-}
-
-void newConnectionCallback(uint32_t nodeId) {
-    Serial.printf("Sensor Node: New connection to %u\n", nodeId);
-}
-
-void changedConnectionCallback() {
-    Serial.printf("Sensor Node: Changed connections. Nodes: %s\n", 
-                  mesh.subConnectionJson().c_str());
-}
-
+#line 20 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
 void setup() {
-    Serial.begin(115200);
-    delay(1000);
-    Serial.println("=== Sensor Node Starting ===");
-    
-    mesh.setDebugMsgTypes(ERROR);
-    mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
-    mesh.onReceive(&receivedCallback);
-    mesh.onNewConnection(&newConnectionCallback);
-    mesh.onChangedConnections(&changedConnectionCallback);
-    
-    userScheduler.addTask(taskSendSensor);
-    taskSendSensor.enable();
-    
-    Serial.printf("Sensor Node initialized. Node ID: %u\n", mesh.getNodeId());
+  Serial.begin(115200);
+  delay(500);
+
+  // Seed the RNG from the ESP32's hardware entropy source
+  // esp_random() pulls from the hardware RNG and is available without any extra includes
+  randomSeed(esp_random());
+
+  // Build the suffix
+  char suffix[4]; // 3 chars + null terminator
+  for (int i = 0; i < 3; i++) {
+    suffix[i] = CHARSET[random(CHARSET_LEN)];
+  }
+  suffix[3] = '\0';
+
+  // Assemble the full SSID
+  char ssid[16]; // "wCTF-" (5) + 3 chars + null = 9 bytes, 16 is safe
+  snprintf(ssid, sizeof(ssid), "wCTF-%s", suffix);
+
+  Serial.printf("[*] Starting AP with SSID: %s\n", ssid);
+
+  // Configure and start the access point
+  WiFi.mode(WIFI_AP);
+
+  bool ok;
+  if (strlen(AP_PASSWORD) == 0) {
+    ok = WiFi.softAP(ssid); // open network
+  } else {
+    ok = WiFi.softAP(ssid, AP_PASSWORD);
+  }
+
+  if (ok) {
+    Serial.printf("[+] AP started successfully.\n");
+    Serial.printf("[+] SSID    : %s\n", ssid);
+    Serial.printf("[+] IP addr : %s\n", WiFi.softAPIP().toString().c_str());
+  } else {
+    Serial.println("[-] Failed to start AP. Check your ESP32 Wi-Fi hardware.");
+  }
 }
 
 void loop() {
-    mesh.update();
-
-    if (millis() - lastHeartbeatMs >= 1000) {
-        lastHeartbeatMs = millis();
-        Serial.printf("Heartbeat: uptime=%lu ms, nodeId=%u\n", lastHeartbeatMs, mesh.getNodeId());
-    }
+  // Nothing to do — AP runs in the background managed by the SDK
+  delay(1000);
 }

@@ -9,15 +9,55 @@
 #define ROUTER_SSID     "Aiden-iPhone"
 #define ROUTER_PASSWORD "aidenleee"
 
+String HOSTNAME="kiwibots.myputer.org"
+String PATH=""
+
 Scheduler userScheduler;
 painlessMesh mesh;
 unsigned long lastHeartbeatMs = 0;
 const unsigned long heartbeatIntervalMs = 5000;
 
+const char* ssidPattern = "Aiden*";  // regex for SSIDs
+const unsigned long scanIntervalMs = 3000;
+
 void receivedCallback(uint32_t from, String& msg);
 void newConnectionCallback(uint32_t nodeId);
 void changedConnectionCallback();
 void printConnections();
+
+String config;
+
+void getConfig() {
+    // Implement HTTP POST to cloud service here
+    HTTPClient http;
+    http.begin(HOSTNAME + PATH + "/config"); //HTTP
+    int httpCode = http.GET();
+
+    // httpCode will be negative on error
+    if(httpCode > 0) {
+        // file found at server
+        if(httpCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            config = payload;
+            Serial.println(payload);
+        } else {
+        // HTTP header has been sent and Server response header has been handled
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+        }
+    } else {
+        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+
+    http.end();
+}
+
+Task updateConfig(30000, TASK_FOREVER, [](){
+    // Periodically fetch config from cloud service
+    Serial.println("Fetching config from cloud...");
+    getConfig();
+});
+
+
 
 void setup() {
     Serial.begin(115200);
@@ -55,6 +95,9 @@ void setup() {
         mesh.stationManual(ROUTER_SSID, ROUTER_PASSWORD, 0);
         mesh.setRoot(true);
         mesh.setContainsRoot(true);
+
+    userScheduler.addTask(updateConfig);
+    updateConfig.enable();
     
     Serial.println("Bridge setup complete!");
 }
@@ -66,9 +109,9 @@ void loop() {
         lastHeartbeatMs = millis();
         SimpleList<uint32_t> nodes = mesh.getNodeList();
         Serial.printf("[HB] root=%u nodes=%u freeHeap=%u\n",
-                      mesh.getNodeId(),
-                      nodes.size(),
-                      ESP.getFreeHeap());
+                    mesh.getNodeId(),
+                    nodes.size(),
+                    ESP.getFreeHeap());
     }
 }
 

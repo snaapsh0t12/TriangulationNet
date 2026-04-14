@@ -50,7 +50,7 @@ void loop() {
     // Kick off an async scan every scanIntervalMs
     if (millis() - lastScanMs >= scanIntervalMs) {
         lastScanMs = millis();
-        int status = WiFi.scanComplete();
+        int status = -7=WiFi.scanComplete();
         if (status == WIFI_SCAN_FAILED) {
             // No scan running — start a new async one (non-blocking)
             WiFi.scanNetworks(true, true);

@@ -1,4 +1,8 @@
 #include "painlessMesh.h"
+#include <WiFi.h>
+#include <Regexp.h>
+#include <ArduinoJson.h>
+
 
 #define MESH_PREFIX     "KiwiBotTracking"
 #define MESH_PASSWORD   "GoBlugolds"
@@ -6,45 +10,185 @@
 
 Scheduler userScheduler;
 painlessMesh mesh;
+uint32_t nodeId = 0; // Unique ID for this node, preset when flashed. Will be written on case. Used to identify the node in the network when sending messages to the root
+uint32_t rootNodeId = 0; // Learned from inbound root control message
 
-// Sensor simulation
-float temperature = 22.5;
-float humidity = 65.0;
-uint32_t sensorId = 1001;
+// Configurable runtime variables
+unsigned long scanIntervalMs = 10000;  // Scan task interval (ms)
+char ssidPatternBuf[64] = "Aiden.*";  // Pattern for SSIDs: make writable
+int minRssiDbm = -100;  // Min RSSI threshold for reporting (-100 to -20)
+
 unsigned long lastHeartbeatMs = 0;
 
-// Task to send sensor data every 30 seconds
-Task taskSendSensor(30000, TASK_FOREVER, [](){
-    // Simulate sensor readings with some variation
-    temperature += random(-10, 10) / 10.0;
-    humidity += random(-50, 50) / 10.0;
-    
-    // Keep values in reasonable ranges
-    temperature = constrain(temperature, 15.0, 35.0);
-    humidity = constrain(humidity, 30.0, 90.0);
-    
-    // Create JSON message
-    String msg = "{";
-    msg += "\"type\":\"sensor\",";
-    msg += "\"nodeId\":" + String(mesh.getNodeId()) + ",";
-    msg += "\"sensorId\":" + String(sensorId) + ",";
-    msg += "\"temperature\":" + String(temperature, 1) + ",";
-    msg += "\"humidity\":" + String(humidity, 1) + ",";
-    msg += "\"timestamp\":" + String(mesh.getNodeTime());
-    msg += "}";
-    
-    mesh.sendBroadcast(msg);
-    Serial.printf("Sent sensor data: T=%.1f degC, H=%.1f%%\n", temperature, humidity);
+// Task to send sensor data every scanIntervalMs milliseconds
+Task taskSendSensor(scanIntervalMs, TASK_FOREVER, [](){
+    int status = WiFi.scanComplete();
+    if (status == WIFI_SCAN_FAILED) {
+        // No scan running — start a new async one (non-blocking)
+        WiFi.scanNetworks(true, true);
+        Serial.println("Scan started...");
+        return;
+    }
+
+    if (status == WIFI_SCAN_RUNNING) {
+        return;
+    }
+
+    int n = status;
+    MatchState ms;
+    for (int i = 0; i < n; i++) {
+        String ssid = WiFi.SSID(i);
+        char ssidBuf[33];
+        ssid.toCharArray(ssidBuf, sizeof(ssidBuf));
+
+        ms.Target(ssidBuf);
+        if (ms.Match(ssidPatternBuf) > 0) {
+            int rssi = WiFi.RSSI(i);
+            uint8_t* bssid = WiFi.BSSID(i);
+
+            char macStr[18];
+            sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X",
+                    bssid[0], bssid[1], bssid[2],
+                    bssid[3], bssid[4], bssid[5]);
+
+            Serial.printf("MATCHED: SSID=%s, MAC=%s, RSSI=%d\n",
+                          ssid.c_str(), macStr, rssi);
+
+            JsonDocument doc;
+            doc["node_id"] = nodeId;
+            doc["kiwibot_ssid"] = ssid.c_str();
+            doc["rssi"] = rssi;
+            doc["kiwibot_mac"] = macStr;
+            doc["timestamp"] = mesh.getNodeTime();
+
+            String payload;
+            serializeJson(doc, payload);
+            if (rootNodeId != 0) {
+                mesh.sendSingle(rootNodeId, payload);
+            } else {
+                // Fallback while root is unknown; root can still receive and command back.
+                mesh.sendBroadcast(payload);
+            }
+        }
+    }
+    WiFi.scanDelete();
+    WiFi.scanNetworks(true, true);
 });
 
 void receivedCallback(uint32_t from, String &msg) {
     Serial.printf("Sensor Node: Received from %u: %s\n", from, msg.c_str());
     
-    // Sensor nodes can respond to commands
-    if (msg.indexOf("\"command\":\"read_sensor\"") > 0) {
-        // Force immediate sensor reading
+    // Parse incoming JSON message
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, msg);
+    if (err) {
+        Serial.printf("JSON parse error: %s\n", err.c_str());
+        return;
+    }
+
+    const char* type = doc["type"] | "";
+
+    // Handle read_sensor command
+    if (strcmp(type, "read_sensor") == 0) {
+        rootNodeId = from;
         taskSendSensor.forceNextIteration();
-        Serial.println("Forced sensor reading requested");
+        Serial.printf("Forced sensor reading. Root set to: %u\n", rootNodeId);
+        return;
+    }
+
+    // Handle config_update message
+    if (strcmp(type, "config_update") == 0) {
+        // Trust model: only accept from established root
+        if (rootNodeId != 0 && from != rootNodeId) {
+            Serial.printf("Config from untrusted sender %u (root is %u). Rejected.\n", from, rootNodeId);
+            return;
+        }
+        rootNodeId = from;  // Update root on first trusted message
+
+        // Check target node: 0 = broadcast to all, otherwise match nodeId
+        uint32_t target = doc["target_node"] | 0;
+        if (target != 0 && target != nodeId) {
+            Serial.printf("Config target mismatch: %u vs %u. Skipped.\n", target, nodeId);
+            return;
+        }
+
+        JsonObject cfg = doc["config"].as<JsonObject>();
+        if (cfg.isNull()) {
+            Serial.println("Config object missing. Rejected.");
+            return;
+        }
+
+        // Stage new values with validation
+        unsigned long newScanInterval = scanIntervalMs;
+        char newPattern[64];
+        strlcpy(newPattern, ssidPatternBuf, sizeof(newPattern));
+        int newMinRssi = minRssiDbm;
+
+        bool valid = true;
+
+        if (cfg["scan_interval_ms"].is<unsigned long>()) {
+            unsigned long v = cfg["scan_interval_ms"].as<unsigned long>();
+            if (v < 1000 || v > 60000) {
+                Serial.printf("Scan interval %lu out of range [1000, 60000]. Rejected.\n", v);
+                valid = false;
+            } else {
+                newScanInterval = v;
+            }
+        }
+
+        if (cfg["ssid_pattern"].is<const char*>()) {
+            const char* p = cfg["ssid_pattern"];
+            if (strlen(p) >= sizeof(newPattern)) {
+                Serial.printf("SSID pattern too long. Rejected.\n");
+                valid = false;
+            } else {
+                strlcpy(newPattern, p, sizeof(newPattern));
+            }
+        }
+
+        if (cfg["min_rssi"].is<int>()) {
+            int v = cfg["min_rssi"].as<int>();
+            if (v < -100 || v > -20) {
+                Serial.printf("Min RSSI %d out of range [-100, -20]. Rejected.\n", v);
+                valid = false;
+            } else {
+                newMinRssi = v;
+            }
+        }
+
+        if (!valid) {
+            // Send NACK
+            JsonDocument nack;
+            nack["type"] = "config_nack";
+            nack["node_id"] = nodeId;
+            nack["msg_id"] = doc["msg_id"] | "";
+            nack["reason"] = "Validation failed";
+            String out;
+            serializeJson(nack, out);
+            mesh.sendSingle(rootNodeId, out);
+            return;
+        }
+
+        // Commit all changes
+        scanIntervalMs = newScanInterval;
+        strlcpy(ssidPatternBuf, newPattern, sizeof(ssidPatternBuf));
+        minRssiDbm = newMinRssi;
+
+        // Update scheduler with new interval
+        taskSendSensor.setInterval(scanIntervalMs);
+
+        Serial.printf("Config applied: interval=%lu ms, pattern=%s, minRssi=%d\n",
+                      newScanInterval, newPattern, newMinRssi);
+
+        // Send ACK
+        JsonDocument ack;
+        ack["type"] = "config_ack";
+        ack["node_id"] = nodeId;
+        ack["msg_id"] = doc["msg_id"] | "";
+        ack["ok"] = true;
+        String out;
+        serializeJson(ack, out);
+        mesh.sendSingle(rootNodeId, out);
     }
 }
 
@@ -54,13 +198,15 @@ void newConnectionCallback(uint32_t nodeId) {
 
 void changedConnectionCallback() {
     Serial.printf("Sensor Node: Changed connections. Nodes: %s\n", 
-                  mesh.subConnectionJson().c_str());
+                mesh.subConnectionJson().c_str());
 }
 
 void setup() {
     Serial.begin(115200);
     delay(1000);
     Serial.println("=== Sensor Node Starting ===");
+
+    WiFi.mode(WIFI_STA);
     
     mesh.setDebugMsgTypes(ERROR);
     mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
@@ -70,6 +216,8 @@ void setup() {
     
     userScheduler.addTask(taskSendSensor);
     taskSendSensor.enable();
+
+    nodeId = mesh.getNodeId();
     
     Serial.printf("Sensor Node initialized. Node ID: %u\n", mesh.getNodeId());
 }
