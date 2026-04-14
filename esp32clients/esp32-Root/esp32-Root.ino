@@ -8,24 +8,26 @@
 #define MESH_PASSWORD   "GoBlugolds"
 #define ROUTER_SSID     "Aiden-iPhone"
 #define ROUTER_PASSWORD "aidenleee"
-
-String HOSTNAME="kiwibots.myputer.org"
-String PATH=""
+#define MESH_PORT       5555
+#define MESH_CHANNEL    6
+String HOSTNAME="https://kiwibots.myputer.org";
+String PATH="";
 
 Scheduler userScheduler;
 painlessMesh mesh;
 unsigned long lastHeartbeatMs = 0;
-const unsigned long heartbeatIntervalMs = 5000;
+const unsigned long heartbeatIntervalMs = 1000;
 
 const char* ssidPattern = "Aiden*";  // regex for SSIDs
 const unsigned long scanIntervalMs = 3000;
+const unsigned long updateIntervalMs = 30000;
 
 void receivedCallback(uint32_t from, String& msg);
 void newConnectionCallback(uint32_t nodeId);
 void changedConnectionCallback();
 void printConnections();
 
-String config;
+JsonDocument config;
 
 void getConfig() {
     // Implement HTTP POST to cloud service here
@@ -38,7 +40,7 @@ void getConfig() {
         // file found at server
         if(httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
-            config = payload;
+            deserializeJson(config, payload);
             Serial.println(payload);
         } else {
         // HTTP header has been sent and Server response header has been handled
@@ -51,10 +53,24 @@ void getConfig() {
     http.end();
 }
 
+void broadcastConfig(const char* ssidPattern, unsigned long scanIntervalMs) {
+    JsonDocument doc;
+    doc["type"] = "config_update";
+    JsonObject cfg = doc["config"].to<JsonObject>();
+    if (strlen(ssidPattern) > 0) {
+        cfg["ssid_pattern"] = ssidPattern;
+    }
+    mesh.sendBroadcast(payload);
+}
+
 Task updateConfig(30000, TASK_FOREVER, [](){
     // Periodically fetch config from cloud service
     Serial.println("Fetching config from cloud...");
     getConfig();
+    String payload;
+
+    serializeJson(config, payload);
+    mesh.sendBroadcast(payload);
 });
 
 
@@ -65,32 +81,32 @@ void setup() {
     
     Serial.println("\n\nStarting bridge initialization...");
 
-        WiFi.mode(WIFI_STA);
-        WiFi.begin(ROUTER_SSID, ROUTER_PASSWORD);
+        // WiFi.mode(WIFI_STA);
+        // WiFi.begin(ROUTER_SSID, ROUTER_PASSWORD);
 
-        uint8_t routerChannel = 1;
-        unsigned long startMs = millis();
-        while (WiFi.status() != WL_CONNECTED && (millis() - startMs) < 10000) {
-            delay(200);
-            Serial.print(".");
-        }
+        // uint8_t routerChannel = MESH_CHANNEL;
+        // unsigned long startMs = millis();
+        // while (WiFi.status() != WL_CONNECTED && (millis() - startMs) < 10000) {
+        //     delay(200);
+        //     Serial.print(".");
+        // }
 
-        if (WiFi.status() == WL_CONNECTED) {
-            routerChannel = WiFi.channel();
-            Serial.printf("\nRouter connected, channel=%u, ip=%s\n", routerChannel,
-                                        WiFi.localIP().toString().c_str());
-            WiFi.disconnect();
-            delay(200);
-        } else {
-            Serial.println("\nRouter connect timeout, defaulting mesh channel to 1");
-        }
-    
+        // if (WiFi.status() == WL_CONNECTED) {
+        //     routerChannel = WiFi.channel();
+        //     Serial.printf("\nRouter connected, channel=%u, ip=%s\n", routerChannel,
+        //                                 WiFi.localIP().toString().c_str());
+        //     WiFi.disconnect();
+        //     delay(200);
+        // } else {
+        //     Serial.println("\nRouter connect timeout, defaulting mesh channel to 1");
+        // }
+    uint8_t routerChannel = MESH_CHANNEL;
     mesh.setDebugMsgTypes(ERROR | STARTUP | CONNECTION);
     mesh.onReceive(&receivedCallback);
     mesh.onNewConnection(&newConnectionCallback);
     mesh.onChangedConnections(&changedConnectionCallback);
     
-        mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, 5555, WIFI_AP_STA,
+        mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT, WIFI_AP_STA,
                             routerChannel);
         mesh.stationManual(ROUTER_SSID, ROUTER_PASSWORD, 0);
         mesh.setRoot(true);
