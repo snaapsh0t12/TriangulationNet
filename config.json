@@ -1,0 +1,5 @@
+{
+    "ssidPattern": "kiwi*",
+    "configUpdateMs": 30000,
+    "scanIntervalMs": 10
+}

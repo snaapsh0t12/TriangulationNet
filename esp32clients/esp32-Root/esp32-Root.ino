@@ -58,8 +58,10 @@ void broadcastConfig(const char* ssidPattern, unsigned long scanIntervalMs) {
     doc["type"] = "config_update";
     JsonObject cfg = doc["config"].to<JsonObject>();
     if (strlen(ssidPattern) > 0) {
-        cfg["ssid_pattern"] = ssidPattern;
+        cfg["ssidPattern"] = ssidPattern;
     }
+    cfg["scanIntervalMs"] = scanIntervalMs;
+    
     mesh.sendBroadcast(payload);
 }
 

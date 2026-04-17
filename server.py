@@ -136,13 +136,13 @@ def ping():
 def config_version():
     # Returns the sha256sum of the config
     
-    return hashlib.sha256(open('config', 'rb').read()).hexdigest()
+    return hashlib.sha256(open('config.json', 'rb').read()).hexdigest()
 
 @app.route('/config', methods=['GET'])
 def config():
     # Returns the config
 
-    return open('config').read()
+    return open('config.json').read()
 
 @app.route('/config_change', methods=['POST'])
 def config_change():

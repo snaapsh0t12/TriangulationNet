@@ -88,14 +88,6 @@ void receivedCallback(uint32_t from, String &msg) {
 
     const char* type = doc["type"] | "";
 
-    // Handle read_sensor command
-    if (strcmp(type, "read_sensor") == 0) {
-        rootNodeId = from;
-        taskSendSensor.forceNextIteration();
-        Serial.printf("Forced sensor reading. Root set to: %u\n", rootNodeId);
-        return;
-    }
-
     // Handle config_update message
     if (strcmp(type, "config_update") == 0) {
         // Trust model: only accept from established root
@@ -114,7 +106,7 @@ void receivedCallback(uint32_t from, String &msg) {
 
         JsonObject cfg = doc["config"].as<JsonObject>();
         if (cfg.isNull()) {
-            Serial.println("Config object missing. Rejected.");
+            Serial.println("Config object missing.");
             return;
         }
 
@@ -126,8 +118,8 @@ void receivedCallback(uint32_t from, String &msg) {
 
         bool valid = true;
 
-        if (cfg["scan_interval_ms"].is<unsigned long>()) {
-            unsigned long v = cfg["scan_interval_ms"].as<unsigned long>();
+        if (cfg["scanIntervalMs"].is<unsigned long>()) {
+            unsigned long v = cfg["scanIntervalMs"].as<unsigned long>();
             if (v < 1000 || v > 60000) {
                 Serial.printf("Scan interval %lu out of range [1000, 60000]. Rejected.\n", v);
                 valid = false;
@@ -136,37 +128,14 @@ void receivedCallback(uint32_t from, String &msg) {
             }
         }
 
-        if (cfg["ssid_pattern"].is<const char*>()) {
-            const char* p = cfg["ssid_pattern"];
+        if (cfg["ssidPattern"].is<const char*>()) {
+            const char* p = cfg["ssidPattern"];
             if (strlen(p) >= sizeof(newPattern)) {
                 Serial.printf("SSID pattern too long. Rejected.\n");
                 valid = false;
             } else {
                 strlcpy(newPattern, p, sizeof(newPattern));
             }
-        }
-
-        if (cfg["min_rssi"].is<int>()) {
-            int v = cfg["min_rssi"].as<int>();
-            if (v < -100 || v > -20) {
-                Serial.printf("Min RSSI %d out of range [-100, -20]. Rejected.\n", v);
-                valid = false;
-            } else {
-                newMinRssi = v;
-            }
-        }
-
-        if (!valid) {
-            // Send NACK
-            JsonDocument nack;
-            nack["type"] = "config_nack";
-            nack["node_id"] = nodeId;
-            nack["msg_id"] = doc["msg_id"] | "";
-            nack["reason"] = "Validation failed";
-            String out;
-            serializeJson(nack, out);
-            mesh.sendSingle(rootNodeId, out);
-            return;
         }
 
         // Commit all changes
@@ -177,18 +146,7 @@ void receivedCallback(uint32_t from, String &msg) {
         // Update scheduler with new interval
         taskSendSensor.setInterval(scanIntervalMs);
 
-        Serial.printf("Config applied: interval=%lu ms, pattern=%s, minRssi=%d\n",
-                      newScanInterval, newPattern, newMinRssi);
-
-        // Send ACK
-        JsonDocument ack;
-        ack["type"] = "config_ack";
-        ack["node_id"] = nodeId;
-        ack["msg_id"] = doc["msg_id"] | "";
-        ack["ok"] = true;
-        String out;
-        serializeJson(ack, out);
-        mesh.sendSingle(rootNodeId, out);
+        Serial.printf("Config applied: interval=%lu ms, pattern=%s, minRssi=%d\n", newScanInterval, newPattern, newMinRssi);
     }
 }
 
