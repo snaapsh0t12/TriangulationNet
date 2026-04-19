@@ -28,7 +28,7 @@ Functions:
 """
 
 from flask import Flask, request, render_template, jsonify, send_file, Response, send_from_directory
-import hashlib, csv, time
+import hashlib, csv, time, tomllib
 
 app = Flask(__name__)
 
@@ -134,30 +134,39 @@ def ping():
 
 @app.route('/config_version', methods=['GET'])
 def config_version():
-    # Returns the sha256sum of the config
-    
-    return hashlib.sha256(open('config.json', 'rb').read()).hexdigest()
+    return hashlib.sha256(open('config.toml', 'rb').read()).hexdigest()
 
 @app.route('/config', methods=['GET'])
 def config():
-    # Returns the config
+    return open('config.toml').read()
 
-    return open('config.json').read()
+@app.route('/config_json', methods=['GET'])
+def config_json():
+    with open('config.toml', 'rb') as f:
+        return jsonify(tomllib.load(f))
 
 @app.route('/config_change', methods=['POST'])
 def config_change():
-    # Changes the config
+    # Changes the config, takes input form the dashboard form
+
+    le = request.args.get('le')  # The old version supports switching between bluetooth and wifi, so we don't need this now but I'll keep it
+
+    # Read the current config
+    with open('config.toml', 'rb') as f:
+        cfg = tomllib.load(f)
 
     # When the user clicks a button the current config is loaded into a form, and the user can edit stuff and hit submit, which sends the new config to this route
-
-    target_address = request.args.get('target_address')
-    le = request.args.get('le')
-    config_update_wait = request.args.get('config_update_wait')
-    clock_delay = request.args.get('clock_delay')
+    if request.args.get('target_address') is not None:
+        cfg['target_address'] = request.args.get('target_address')
+    if request.args.get('clock_delay') is not None:
+        cfg['clock_delay'] = int(request.args.get('clock_delay'))
 
     # Load these new settings into the config
+    with open('config.toml', 'w') as f:
+        for k, v in cfg.items():
+            f.write(f'{k} = {repr(v) if isinstance(v, str) else v}\n')
 
-    return 
+    return ''
 
 @app.route('/database_change', methods=['POST'])
 def database_change():

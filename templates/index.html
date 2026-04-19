@@ -30,7 +30,7 @@
                 <!--<img id="dynamicImage" alt="" style="display:none;"-->
             </div>
             <div class="panel-footer">
-                <small>Realtime node/target positions — pan/zoom with D3 controls</small>
+                <small>Realtime node/target positions - pan/zoom with D3 controls</small>
             </div>
         </section>
 
@@ -120,7 +120,19 @@
             const el = document.getElementById(id);
             if (el) el.classList.add('active');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('selected', b.dataset.tab === id));
-            localStorage.setItem('selectedTab', id); // Save current tab
+            localStorage.setItem('selectedTab', id);
+            if (id === 'config') loadConfigForm();
+        }
+
+        async function loadConfigForm() {
+            try {
+                const cfg = await fetch('/config_json').then(r => r.json());
+                const form = document.getElementById('config-form');
+                if (cfg.target_address !== undefined) form.target_address.value = cfg.target_address;
+                if (cfg.clock_delay !== undefined)    form.clock_delay.value    = cfg.clock_delay;
+            } catch(e) {
+                console.error('Failed to load config', e);
+            }
         }
 
         async function manualAdd(e){
@@ -151,7 +163,7 @@
                 clock_delay: form.clock_delay.value
             });
             await fetch('/config_change?'+params.toString(), { method: 'POST' });
-            alert('Config saved (server handler must be implemented)');
+            //alert('Config saved (server handler must be implemented)');
         }
 
         function reloadGraph(){
