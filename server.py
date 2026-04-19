@@ -214,9 +214,7 @@ def node_coords():
     # Grabs the nodes.csv
     # the data should be node#,x,y,range(m)
     csv_data = open("data/nodes.csv", "r").read()
-    response = Response(csv_data, content_type="text/csv")
-    response.headers["Content-Disposition"] = "attachment; filename=nodes.csv"
-    return response
+    return Response(csv_data, content_type="text/plain")
 
 @app.route('/static/images/<path:filename>')
 def static_images(filename):

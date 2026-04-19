@@ -45,7 +45,7 @@
                 <div class="tab-content" id="nodes">
                     <h3>Nodes</h3>
                     <div class="nodes-list">
-                        <button class="btn small" onclick="fetch('/nodes').then(r=>r.text()).then(t=>{ const w = window.open(); w.document.body.innerText = t; })">Download nodes.csv</button>
+                        <button class="btn small" onclick="window.open('/nodes', '_blank')">View nodes.csv</button>
                         <div id="nodes-table">Loading nodes...</div>
                     </div>
                 </div>
