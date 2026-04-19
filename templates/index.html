@@ -91,6 +91,26 @@
                     <h3>Notifications</h3>
                     <div id="notify-list">No notifications yet.</div>
                 </div>
+
+                <div class="tab-content" id="edit-node">
+                    <h3>Edit Node</h3>
+                    <form id="edit-node-form" onsubmit="saveNodeEdit(event)">
+                        <label>MAC</label>
+                        <input name="mac" readonly>
+                        <label>Nickname</label>
+                        <input name="nickname">
+                        <label>X</label>
+                        <input name="x" type="number" step="any" required>
+                        <label>Y</label>
+                        <input name="y" type="number" step="any" required>
+                        <label>Range (ft)</label>
+                        <input name="range" type="number" step="any">
+                        <div class="actions">
+                            <button type="submit" class="btn">Save</button>
+                            <button type="button" class="btn small" onclick="showTab('overview')">Cancel</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div class="sidebar-bottom bottom-right">
@@ -124,6 +144,37 @@
             if (id === 'config') loadConfigForm();
         }
 
+        window.editNode = function(node) {
+            const form = document.getElementById('edit-node-form');
+            form.mac.value      = node.mac || node.id || '';
+            form.nickname.value = node.nickname || '';
+            form.x.value        = node.x ?? '';
+            form.y.value        = node.y ?? '';
+            form.range.value    = node.range ?? '';
+            showTab('edit-node');
+        };
+
+        async function saveNodeEdit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const payload = {
+                mac:      form.mac.value,
+                nickname: form.nickname.value,
+                x:        parseFloat(form.x.value),
+                y:        parseFloat(form.y.value),
+                range:    parseFloat(form.range.value) || 0,
+            };
+            const res = await fetch('/node_edit', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) { alert('Failed to save: ' + await res.text()); return; }
+            loadNodes();
+            if (window.reloadD3) window.reloadD3();
+            showTab('overview');
+        }
+
         async function loadConfigForm() {
             try {
                 const cfg = await fetch('/config_json').then(r => r.json());
@@ -142,13 +193,15 @@
             const coords = form.coords.value.trim();
             if(!id || !coords) return;
             try {
-                await fetch('/register_final', {
+                const res = await fetch('/register_final', {
                     method: 'POST',
                     headers:{'Content-Type':'application/json'},
                     body: JSON.stringify({id:id, data: coords})
                 });
+                if(!res.ok){ alert('Failed: ' + await res.text()); return; }
                 form.reset();
-                alert('Added');
+                loadNodes();
+                if (window.reloadD3) window.reloadD3();
             } catch(err){
                 console.error(err);
                 alert('Failed to add');

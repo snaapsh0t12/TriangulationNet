@@ -54,10 +54,14 @@ def register():
 
     data = request.json
     id = data.get('id')
-    csv_data = csv.reader("data/nodes.csv", delimeter=",") # gets mac addresses from nodes.csv so we don't reregister
+
     mac_addresses = []
-    for row in csv_data:
-        mac_addresses.append(row[0])
+    with open("data/nodes.csv", newline="") as f:
+        reader = csv.reader(f)
+        next(reader, None)  # skip header
+        for row in reader:
+            if row:
+                mac_addresses.append(row[0])
 
     if id is not None and id not in toAdd and id not in mac_addresses:
         toAdd.append(id)
@@ -71,38 +75,28 @@ def register_final():
 
     global toAdd
     
-    data = request.json
+    payload = request.json
 
-    id = data.get('id')
-    data = data.get('data')
+    id = payload.get('id')
+    coords = payload.get('data', '')
+    nickname = payload.get('nickname') or id
+    rng = payload.get('range', 164)
 
-    x=data.split(",")[0].replace(" ", "")
-    y=data.split(",")[0].replace(" ", "")
-
-    """
-    # This can be commented for debugging, but should be uncommented for production
+    parts = [p.strip() for p in coords.split(',')]
+    if len(parts) < 2:
+        return 'Coordinates must be "x,y"', 400
     try:
-        x=int(x)
-        y=int(y)
-    except:
-        print("Not formatted correctly")
-        return ''
+        x = int(parts[0])
+        y = int(parts[1])
+    except ValueError:
+        return 'Coordinates must be integers', 400
 
-    """
-
-    toAdd.remove(id)
-
-    print(id, x, y)
-
-    # Write to the database
+    if id in toAdd:
+        toAdd.remove(id)
 
     with open("data/nodes.csv", mode='a', newline='') as file:
         writer = csv.writer(file)
-        
-        # Write the new row
-        writer.writerow([id, x, y])
-
-    # Write to the cache
+        writer.writerow([id, x, y, rng, nickname])
 
     with open('data/cache', 'a') as file:
         file.write(f'{id} 0\n')
@@ -167,6 +161,43 @@ def config_change():
             f.write(f'{k} = {repr(v) if isinstance(v, str) else v}\n')
 
     return ''
+
+@app.route('/node_edit', methods=['POST'])
+def node_edit():
+    # Update a single node row in data/nodes.csv, keyed by mac
+
+    data = request.get_json()
+    mac = data.get('mac')
+    if not mac:
+        return 'Missing mac', 400
+
+    with open('data/nodes.csv', 'r', newline='') as f:
+        rows = list(csv.reader(f))
+
+    if not rows:
+        return 'Empty nodes file', 400
+
+    header, body = rows[0], rows[1:]
+    idx = {name: i for i, name in enumerate(header)}
+
+    updated = False
+    for row in body:
+        if row and row[idx['mac']] == mac:
+            for field in ('x', 'y', 'range', 'nickname'):
+                if field in data and field in idx:
+                    row[idx[field]] = str(data[field])
+            updated = True
+            break
+
+    if not updated:
+        return 'Node not found', 404
+
+    with open('data/nodes.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(body)
+
+    return 'OK'
 
 @app.route('/database_change', methods=['POST'])
 def database_change():
