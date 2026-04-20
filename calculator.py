@@ -92,6 +92,111 @@ def possible_coordinates(detecting_nodes, csv_file='data/nodes.csv'):
         return None
     else:
         return list(detected_coordinates)
+    
+def signal_to_weight(signal):
+    """
+    Convert signal strength into a positive weight.
+
+    Supports:
+    - negative dBm style values like -30, -70
+    - positive percent-like values
+    """
+    try:
+        s = float(signal)
+    except (TypeError, ValueError):
+        return 1.0
+
+    if s < 0:
+        weight = 100 + s
+    else:
+        weight = s
+
+    if weight < 1:
+        weight = 1.0
+
+    return weight
+
+
+def weighted_best_point(detected_signals, csv_file='data/nodes.csv'):
+    """
+    detected_signals example:
+        {
+            "node1": "-35",
+            "node2": "-60"
+        }
+
+    Returns:
+        (best_x, best_y) or None
+
+    Also redraws static/images/image.png with a single weighted estimate point.
+    """
+    nodes = {}
+
+    with open(csv_file, mode='r') as file:
+        reader = csv.reader(file)
+        next(reader)
+        for row in reader:
+            node_id = row[0].strip()
+            x = int(row[1].strip())
+            y = int(row[2].strip())
+            range_value = int(row[3].strip())
+            nodes[node_id] = (x, y, range_value)
+
+    weighted_x_sum = 0.0
+    weighted_y_sum = 0.0
+    total_weight = 0.0
+
+    for node_id, signal in detected_signals.items():
+        if node_id not in nodes:
+            continue
+
+        x, y, range_value = nodes[node_id]
+        weight = signal_to_weight(signal)
+
+        weighted_x_sum += x * weight
+        weighted_y_sum += y * weight
+        total_weight += weight
+
+    plt.figure(figsize=(10, 10))
+    img = mpimg.imread('static/images/dark_map.png')
+    plt.imshow(img, extent=[-20, 100, -20, 40])
+
+    for node_id, (x, y, range_value) in nodes.items():
+        circle = plt.Circle((x, y), range_value, color='blue', fill=False, linestyle=(0, (1, 10)))
+        plt.gca().add_artist(circle)
+        plt.plot(x, y, 'o', label=node_id)
+        plt.text(x, y, f' {node_id}', fontsize=10, verticalalignment='bottom')
+
+    if total_weight == 0:
+        plt.title('Weighted Position Estimate (No valid detections)')
+        plt.xlim(-20, 100)
+        plt.ylim(-20, 40)
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.grid(color='gray', linestyle='--', linewidth=0.5)
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.savefig('static/images/image.png')
+        plt.close()
+        return None
+
+    best_x = weighted_x_sum / total_weight
+    best_y = weighted_y_sum / total_weight
+
+    plt.plot(best_x, best_y, 'r*', markersize=16, label='Weighted Best Point')
+    plt.text(best_x, best_y, f' best ({best_x:.1f}, {best_y:.1f})', fontsize=10, color='red')
+
+    plt.title('Weighted Position Estimate')
+    plt.xlim(-20, 100)
+    plt.ylim(-20, 40)
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.grid(color='gray', linestyle='--', linewidth=0.5)
+    plt.gca().set_aspect('equal', adjustable='box')
+
+    plt.savefig('static/images/image.png')
+    plt.close()
+
+    return (best_x, best_y)
 
 #detecting_nodes = ['node1', 'node2']
 #non_detecting_nodes = ['node4', 'node3']

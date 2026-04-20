@@ -24,24 +24,43 @@ def read_config():
     return config
 
 def write_logs(cache):
-    # Write the strength for each node, the coordinates that the target is in, and the time to the logs
-    detected_nodes = []
-    
+    # Build a dict of the latest signal seen from each node
+    latest_by_node = {}
+
     for line in cache:
-        detected_nodes.append(line.split()[0])
-    
-    print(detected_nodes)
+        parts = line.strip().split()
+        if len(parts) < 3:
+            continue
 
-    coordinates = calculator.possible_coordinates(detected_nodes) # This gets all possible coordinates in range of all of the nodes, not using fancy math to determine the best point between them  # This function also maps the coordinates to the map
+        node_id = parts[0]
+        strength = parts[1]
 
-    if coordinates is None:
-        coordinates = "no_coordinates"
+        try:
+            timestamp = float(parts[2])
+        except ValueError:
+            continue
+
+        if node_id not in latest_by_node or timestamp > latest_by_node[node_id]["timestamp"]:
+            latest_by_node[node_id] = {
+                "strength": strength,
+                "timestamp": timestamp
+            }
+
+    detected_signals = {}
+    for node_id, info in latest_by_node.items():
+        detected_signals[node_id] = info["strength"]
+
+    best_point = calculator.weighted_best_point(detected_signals)
+
+    if best_point is None:
+        point_text = "no_best_point"
+    else:
+        point_text = f"best_point: ({best_point[0]:.2f}, {best_point[1]:.2f})"
 
     with open("log.log", "a") as f:
         f.write(f"Time: {round(time.time())}\n")
-        f.write(f"{coordinates}\n")
-        # print("STRENGTHS", strengths)
-        f.writelines(detected_nodes)
+        f.write(f"{point_text}\n")
+        f.write(f"signals: {detected_signals}\n")
         f.write("\n---\n")
 
 def process_cache():
