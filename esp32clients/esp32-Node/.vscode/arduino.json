@@ -5,7 +5,7 @@
   "board": "esp32:esp32:nodemcu-32s",
   "programmer": "esptool",
   "useProgrammer": true,
-  "optimize_for_debug": false,
+  "optimize_for_debug": true,
   "configurationRequired": true,
   "compile_profile": "profile-1772727930444",
   "monitorPortSettings": {

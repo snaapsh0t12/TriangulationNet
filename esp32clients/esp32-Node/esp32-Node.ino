@@ -10,7 +10,7 @@
 
 Scheduler userScheduler;
 painlessMesh mesh;
-uint32_t nodeId = 0; // Unique ID for this node, preset when flashed. Will be written on case. Used to identify the node in the network when sending messages to the root
+uint32_t nodeId = 1; // Unique ID for this node, preset when flashed. Will be written on case. Used to identify the node in the network when sending messages to the root
 uint32_t rootNodeId = 0; // Learned from inbound root control message
 
 // Configurable runtime variables
@@ -22,6 +22,7 @@ unsigned long lastHeartbeatMs = 0;
 
 // Task to send sensor data every scanIntervalMs milliseconds
 Task taskSendSensor(scanIntervalMs, TASK_FOREVER, [](){
+    Serial.println("Scanning for WiFi networks...");
     int status = WiFi.scanComplete();
     if (status == WIFI_SCAN_FAILED) {
         // No scan running — start a new async one (non-blocking)
@@ -118,8 +119,8 @@ void receivedCallback(uint32_t from, String &msg) {
 
         bool valid = true;
 
-        if (cfg["scanIntervalMs"].is<unsigned long>()) {
-            unsigned long v = cfg["scanIntervalMs"].as<unsigned long>();
+        if (cfg["scan_interval_ms"].is<unsigned long>()) {
+            unsigned long v = cfg["scan_interval_ms"].as<unsigned long>();
             if (v < 1000 || v > 60000) {
                 Serial.printf("Scan interval %lu out of range [1000, 60000]. Rejected.\n", v);
                 valid = false;
@@ -128,8 +129,8 @@ void receivedCallback(uint32_t from, String &msg) {
             }
         }
 
-        if (cfg["ssidPattern"].is<const char*>()) {
-            const char* p = cfg["ssidPattern"];
+        if (cfg["ssid_pattern"].is<const char*>()) {
+            const char* p = cfg["ssid_pattern"];
             if (strlen(p) >= sizeof(newPattern)) {
                 Serial.printf("SSID pattern too long. Rejected.\n");
                 valid = false;
@@ -175,7 +176,7 @@ void setup() {
     userScheduler.addTask(taskSendSensor);
     taskSendSensor.enable();
 
-    nodeId = mesh.getNodeId();
+    // nodeId = mesh.getNodeId();
     
     Serial.printf("Sensor Node initialized. Node ID: %u\n", mesh.getNodeId());
 }

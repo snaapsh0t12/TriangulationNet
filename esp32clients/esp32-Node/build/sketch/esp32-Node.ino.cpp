@@ -1,70 +1,204 @@
 #include <Arduino.h>
 #line 1 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
-/*
- * wCTF Random SSID Generator for ESP32
- *
- * On each boot, generates a random 3-character suffix (A-Z, 0-9)
- * and brings up a Wi-Fi access point named wCTF-XXX.
- *
- * Board: ESP32 (any variant)
- * Framework: Arduino
- */
-
+#include "painlessMesh.h"
 #include <WiFi.h>
+#include <Regexp.h>
+#include <ArduinoJson.h>
 
-// Characters allowed in the suffix: uppercase letters + digits
-static const char CHARSET[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-static const int  CHARSET_LEN = sizeof(CHARSET) - 1; // exclude null terminator
 
-// AP password — set to "" for an open network
-static const char *AP_PASSWORD = "";
+#define MESH_PREFIX     "KiwiBotTracking"
+#define MESH_PASSWORD   "GoBlugolds"
+#define MESH_PORT       5555
 
-#line 20 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+Scheduler userScheduler;
+painlessMesh mesh;
+uint32_t nodeId = 1; // Unique ID for this node, preset when flashed. Will be written on case. Used to identify the node in the network when sending messages to the root
+uint32_t rootNodeId = 0; // Learned from inbound root control message
+
+// Configurable runtime variables
+unsigned long scanIntervalMs = 10000;  // Scan task interval (ms)
+char ssidPatternBuf[64] = "Aiden.*";  // Pattern for SSIDs: make writable
+int minRssiDbm = -100;  // Min RSSI threshold for reporting (-100 to -20)
+
+unsigned long lastHeartbeatMs = 0;
+
+// Task to send sensor data every scanIntervalMs milliseconds
+Task taskSendSensor(scanIntervalMs, TASK_FOREVER, [](){
+    Serial.println("Scanning for WiFi networks...");
+    int status = WiFi.scanComplete();
+    if (status == WIFI_SCAN_FAILED) {
+        // No scan running — start a new async one (non-blocking)
+        WiFi.scanNetworks(true, true);
+        Serial.println("Scan started...");
+        return;
+    }
+
+    if (status == WIFI_SCAN_RUNNING) {
+        return;
+    }
+
+    int n = status;
+    MatchState ms;
+    for (int i = 0; i < n; i++) {
+        String ssid = WiFi.SSID(i);
+        char ssidBuf[33];
+        ssid.toCharArray(ssidBuf, sizeof(ssidBuf));
+
+        ms.Target(ssidBuf);
+        if (ms.Match(ssidPatternBuf) > 0) {
+            int rssi = WiFi.RSSI(i);
+            uint8_t* bssid = WiFi.BSSID(i);
+
+            char macStr[18];
+            sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X",
+                    bssid[0], bssid[1], bssid[2],
+                    bssid[3], bssid[4], bssid[5]);
+
+            Serial.printf("MATCHED: SSID=%s, MAC=%s, RSSI=%d\n",
+                          ssid.c_str(), macStr, rssi);
+
+            JsonDocument doc;
+            doc["node_id"] = nodeId;
+            doc["kiwibot_ssid"] = ssid.c_str();
+            doc["rssi"] = rssi;
+            doc["kiwibot_mac"] = macStr;
+            doc["timestamp"] = mesh.getNodeTime();
+
+            String payload;
+            serializeJson(doc, payload);
+            if (rootNodeId != 0) {
+                mesh.sendSingle(rootNodeId, payload);
+            } else {
+                // Fallback while root is unknown; root can still receive and command back.
+                mesh.sendBroadcast(payload);
+            }
+        }
+    }
+    WiFi.scanDelete();
+    WiFi.scanNetworks(true, true);
+});
+
+#line 79 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+void receivedCallback(uint32_t from, String &msg);
+#line 154 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+void newConnectionCallback(uint32_t nodeId);
+#line 158 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+void changedConnectionCallback();
+#line 163 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
 void setup();
-#line 60 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+#line 184 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
 void loop();
-#line 20 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+#line 79 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Node/esp32-Node.ino"
+void receivedCallback(uint32_t from, String &msg) {
+    Serial.printf("Sensor Node: Received from %u: %s\n", from, msg.c_str());
+    
+    // Parse incoming JSON message
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, msg);
+    if (err) {
+        Serial.printf("JSON parse error: %s\n", err.c_str());
+        return;
+    }
+
+    const char* type = doc["type"] | "";
+
+    // Handle config_update message
+    if (strcmp(type, "config_update") == 0) {
+        // Trust model: only accept from established root
+        if (rootNodeId != 0 && from != rootNodeId) {
+            Serial.printf("Config from untrusted sender %u (root is %u). Rejected.\n", from, rootNodeId);
+            return;
+        }
+        rootNodeId = from;  // Update root on first trusted message
+
+        // Check target node: 0 = broadcast to all, otherwise match nodeId
+        uint32_t target = doc["target_node"] | 0;
+        if (target != 0 && target != nodeId) {
+            Serial.printf("Config target mismatch: %u vs %u. Skipped.\n", target, nodeId);
+            return;
+        }
+
+        JsonObject cfg = doc["config"].as<JsonObject>();
+        if (cfg.isNull()) {
+            Serial.println("Config object missing.");
+            return;
+        }
+
+        // Stage new values with validation
+        unsigned long newScanInterval = scanIntervalMs;
+        char newPattern[64];
+        strlcpy(newPattern, ssidPatternBuf, sizeof(newPattern));
+        int newMinRssi = minRssiDbm;
+
+        bool valid = true;
+
+        if (cfg["scan_interval_ms"].is<unsigned long>()) {
+            unsigned long v = cfg["scan_interval_ms"].as<unsigned long>();
+            if (v < 1000 || v > 60000) {
+                Serial.printf("Scan interval %lu out of range [1000, 60000]. Rejected.\n", v);
+                valid = false;
+            } else {
+                newScanInterval = v;
+            }
+        }
+
+        if (cfg["ssid_pattern"].is<const char*>()) {
+            const char* p = cfg["ssid_pattern"];
+            if (strlen(p) >= sizeof(newPattern)) {
+                Serial.printf("SSID pattern too long. Rejected.\n");
+                valid = false;
+            } else {
+                strlcpy(newPattern, p, sizeof(newPattern));
+            }
+        }
+
+        // Commit all changes
+        scanIntervalMs = newScanInterval;
+        strlcpy(ssidPatternBuf, newPattern, sizeof(ssidPatternBuf));
+        minRssiDbm = newMinRssi;
+
+        // Update scheduler with new interval
+        taskSendSensor.setInterval(scanIntervalMs);
+
+        Serial.printf("Config applied: interval=%lu ms, pattern=%s, minRssi=%d\n", newScanInterval, newPattern, newMinRssi);
+    }
+}
+
+void newConnectionCallback(uint32_t nodeId) {
+    Serial.printf("Sensor Node: New connection to %u\n", nodeId);
+}
+
+void changedConnectionCallback() {
+    Serial.printf("Sensor Node: Changed connections. Nodes: %s\n", 
+                mesh.subConnectionJson().c_str());
+}
+
 void setup() {
-  Serial.begin(115200);
-  delay(500);
+    Serial.begin(115200);
+    delay(1000);
+    Serial.println("=== Sensor Node Starting ===");
 
-  // Seed the RNG from the ESP32's hardware entropy source
-  // esp_random() pulls from the hardware RNG and is available without any extra includes
-  randomSeed(esp_random());
+    WiFi.mode(WIFI_STA);
+    
+    mesh.setDebugMsgTypes(ERROR);
+    mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
+    mesh.onReceive(&receivedCallback);
+    mesh.onNewConnection(&newConnectionCallback);
+    mesh.onChangedConnections(&changedConnectionCallback);
+    
+    userScheduler.addTask(taskSendSensor);
+    taskSendSensor.enable();
 
-  // Build the suffix
-  char suffix[4]; // 3 chars + null terminator
-  for (int i = 0; i < 3; i++) {
-    suffix[i] = CHARSET[random(CHARSET_LEN)];
-  }
-  suffix[3] = '\0';
-
-  // Assemble the full SSID
-  char ssid[16]; // "wCTF-" (5) + 3 chars + null = 9 bytes, 16 is safe
-  snprintf(ssid, sizeof(ssid), "wCTF-%s", suffix);
-
-  Serial.printf("[*] Starting AP with SSID: %s\n", ssid);
-
-  // Configure and start the access point
-  WiFi.mode(WIFI_AP);
-
-  bool ok;
-  if (strlen(AP_PASSWORD) == 0) {
-    ok = WiFi.softAP(ssid); // open network
-  } else {
-    ok = WiFi.softAP(ssid, AP_PASSWORD);
-  }
-
-  if (ok) {
-    Serial.printf("[+] AP started successfully.\n");
-    Serial.printf("[+] SSID    : %s\n", ssid);
-    Serial.printf("[+] IP addr : %s\n", WiFi.softAPIP().toString().c_str());
-  } else {
-    Serial.println("[-] Failed to start AP. Check your ESP32 Wi-Fi hardware.");
-  }
+    // nodeId = mesh.getNodeId();
+    
+    Serial.printf("Sensor Node initialized. Node ID: %u\n", mesh.getNodeId());
 }
 
 void loop() {
-  // Nothing to do — AP runs in the background managed by the SDK
-  delay(1000);
+    mesh.update();
+
+    if (millis() - lastHeartbeatMs >= 1000) {
+        lastHeartbeatMs = millis();
+        Serial.printf("Heartbeat: uptime=%lu ms, nodeId=%u\n", lastHeartbeatMs, mesh.getNodeId());
+    }
 }
