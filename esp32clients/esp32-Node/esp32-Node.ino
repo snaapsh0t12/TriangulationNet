@@ -12,6 +12,7 @@ Scheduler userScheduler;
 painlessMesh mesh;
 uint32_t nodeId = 1; // Unique ID for this node, preset when flashed. Will be written on case. Used to identify the node in the network when sending messages to the root
 uint32_t rootNodeId = 0; // Learned from inbound root control message
+bool meshConnected = false;
 
 // Configurable runtime variables
 unsigned long scanIntervalMs = 10000;  // Scan task interval (ms)
@@ -22,6 +23,10 @@ unsigned long lastHeartbeatMs = 0;
 
 // Task to send sensor data every scanIntervalMs milliseconds
 Task taskSendSensor(scanIntervalMs, TASK_FOREVER, [](){
+    if (!meshConnected) {
+        return;
+    }
+
     Serial.println("Scanning for WiFi networks...");
     int status = WiFi.scanComplete();
     if (status == WIFI_SCAN_FAILED) {
@@ -36,8 +41,16 @@ Task taskSendSensor(scanIntervalMs, TASK_FOREVER, [](){
     }
 
     int n = status;
+    if (n <= 0) {
+        WiFi.scanDelete();
+        WiFi.scanNetworks(true, true);
+        return;
+    }
+
     MatchState ms;
     for (int i = 0; i < n; i++) {
+        delay(0); // Keep watchdog fed while processing larger scans.
+
         String ssid = WiFi.SSID(i);
         char ssidBuf[33];
         ssid.toCharArray(ssidBuf, sizeof(ssidBuf));
@@ -46,11 +59,15 @@ Task taskSendSensor(scanIntervalMs, TASK_FOREVER, [](){
         if (ms.Match(ssidPatternBuf) > 0) {
             int rssi = WiFi.RSSI(i);
             uint8_t* bssid = WiFi.BSSID(i);
+            if (bssid == nullptr) {
+                Serial.printf("Skipping AP %d due to null BSSID pointer\n", i);
+                continue;
+            }
 
             char macStr[18];
-            sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X",
-                    bssid[0], bssid[1], bssid[2],
-                    bssid[3], bssid[4], bssid[5]);
+            snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X",
+                     bssid[0], bssid[1], bssid[2],
+                     bssid[3], bssid[4], bssid[5]);
 
             Serial.printf("MATCHED: SSID=%s, MAC=%s, RSSI=%d\n",
                           ssid.c_str(), macStr, rssi);
@@ -153,9 +170,11 @@ void receivedCallback(uint32_t from, String &msg) {
 
 void newConnectionCallback(uint32_t nodeId) {
     Serial.printf("Sensor Node: New connection to %u\n", nodeId);
+    meshConnected = true;
 }
 
 void changedConnectionCallback() {
+    meshConnected = mesh.getNodeList().size() > 0;
     Serial.printf("Sensor Node: Changed connections. Nodes: %s\n", 
                 mesh.subConnectionJson().c_str());
 }
@@ -164,6 +183,9 @@ void setup() {
     Serial.begin(115200);
     delay(1000);
     Serial.println("=== Sensor Node Starting ===");
+
+    esp_reset_reason_t reason = esp_reset_reason();
+    Serial.printf("Reset reason: %d\n", reason);
 
     WiFi.mode(WIFI_STA);
     
