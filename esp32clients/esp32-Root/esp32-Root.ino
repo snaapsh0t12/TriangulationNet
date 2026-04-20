@@ -40,6 +40,13 @@ void getConfig() {
         // file found at server
         if(httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
+            String jsonPayload, err;
+            if (tomlToJsonMinimal(payload, jsonPayload, err)) {
+                mesh.sendBroadcast(jsonPayload);
+                Serial.println(jsonPayload);
+            } else {
+                Serial.println(err);
+            }
             deserializeJson(config, payload);
             Serial.println(payload);
         } else {
@@ -61,8 +68,11 @@ void broadcastConfig(const char* ssidPattern, unsigned long scanIntervalMs) {
         cfg["ssidPattern"] = ssidPattern;
     }
     cfg["scanIntervalMs"] = scanIntervalMs;
+
+    String payload;
+    serializeJson(doc, payload);
     
-    mesh.sendBroadcast(payload);
+    // mesh.sendBroadcast(payload);
 }
 
 Task updateConfig(30000, TASK_FOREVER, [](){
@@ -71,8 +81,8 @@ Task updateConfig(30000, TASK_FOREVER, [](){
     getConfig();
     String payload;
 
-    serializeJson(config, payload);
-    mesh.sendBroadcast(payload);
+    // serializeJson(config, payload);
+    // mesh.sendBroadcast(payload);
 });
 
 
@@ -162,4 +172,91 @@ void printConnections() {
         first = false;
     }
     Serial.println();
+}
+
+#include <ArduinoJson.h>
+
+static String trimCopy(String s) {
+  s.trim();
+  return s;
+}
+
+static void stripQuotes(String& s) {
+  s = trimCopy(s);
+  if (s.length() >= 2 && s[0] == '"' && s[s.length() - 1] == '"') {
+    s = s.substring(1, s.length() - 1);
+  }
+}
+
+bool tomlToJsonMinimal(const String& toml, String& outJson, String& outErr) {
+  String ssidPattern = "";
+  unsigned long configUpdateMs = 0;
+  unsigned long scanIntervalMs = 0;
+
+  bool havePattern = false;
+  bool haveConfigUpdateMs = false;
+  bool haveScanIntervalMs = false;
+
+  int i = 0;
+  while (i < toml.length()) {
+    int nl = toml.indexOf('\n', i);
+    if (nl < 0) nl = toml.length();
+    String line = toml.substring(i, nl);
+    i = nl + 1;
+
+    line.trim();
+    if (line.length() == 0) continue;
+    if (line.startsWith("#")) continue;
+
+    int hashPos = line.indexOf('#');
+    if (hashPos >= 0) {
+      line = line.substring(0, hashPos);
+      line.trim();
+      if (line.length() == 0) continue;
+    }
+
+    int eq = line.indexOf('=');
+    if (eq < 0) continue;
+
+    String key = line.substring(0, eq);
+    String val = line.substring(eq + 1);
+    key.trim();
+    val.trim();
+
+    if (key == "ssid_pattern") {
+      stripQuotes(val);
+      ssidPattern = val;
+      havePattern = true;
+    } else if (key == "config_update_ms") {
+      configUpdateMs = (unsigned long)val.toInt();
+      haveConfigUpdateMs = true;
+    } else if (key == "scan_interval_ms") {
+      scanIntervalMs = (unsigned long)val.toInt();
+      haveScanIntervalMs = true;
+    }
+  }
+
+  if (!havePattern || ssidPattern.length() == 0 || ssidPattern.length() >= 64) {
+    outErr = "ssid_pattern missing or invalid";
+    return false;
+  }
+  if (!haveConfigUpdateMs || configUpdateMs < 1000 || configUpdateMs > 3600000) {
+    outErr = "config_update_ms missing or out of range";
+    return false;
+  }
+  if (!haveScanIntervalMs || scanIntervalMs < 1000 || scanIntervalMs > 60000) {
+    outErr = "scan_interval_ms missing or out of range";
+    return false;
+  }
+
+  JsonDocument doc;
+  doc["type"] = "config_update";
+  JsonObject cfg = doc["config"].to<JsonObject>();
+  cfg["ssid_pattern"] = ssidPattern;
+  cfg["config_update_ms"] = configUpdateMs;
+  cfg["scan_interval_ms"] = scanIntervalMs;
+
+  outJson = "";
+  serializeJson(doc, outJson);
+  return true;
 }

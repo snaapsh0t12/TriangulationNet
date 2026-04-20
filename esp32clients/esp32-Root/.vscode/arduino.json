@@ -1,8 +1,8 @@
 {
-  "port": "/dev/ttyUSB2",
-  "configuration": "UploadSpeed=921600,FlashFreq=80,DebugLevel=info,EraseFlash=none",
+  "port": "/dev/ttyS0",
+  "configuration": "",
   "output": "build",
-  "board": "esp32:esp32:nodemcu-32s",
+  "board": "",
   "programmer": "esptool",
   "useProgrammer": true,
   "optimize_for_debug": false,
@@ -17,6 +17,7 @@
       "parity": "none",
       "stopBits": "one"
     },
-    "profile_name": ""
+    "profile_name": "",
+    "port": "/dev/ttyS0"
   }
 }
