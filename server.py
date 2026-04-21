@@ -106,7 +106,7 @@ def register_final():
 @app.route('/ping', methods=['POST'])
 def ping():
 
-    # Test if the node is in the database, if not tell it to register
+    # TODO: Test if the node is in the database, if not tell it to register
 
     # Node can ping the target
     data = request.get_json()
@@ -121,9 +121,23 @@ def ping():
 
     # Write to the cache
 
-    with open("data/cache", "a") as file:
-        file.write(f"{id} {strength} {round(time.time())}\n")
-    
+    with open("data/cache", "r") as file:
+        lines = file.readlines()
+
+    timestamp = time.time()
+    updated = False
+    for i, line in enumerate(lines):
+        if line.split(' ', 1)[0] == id:
+            lines[i] = f"{id} {timestamp}\n"
+            updated = True
+            break
+
+    if not updated:
+        lines.append(f"{id} {timestamp}\n")
+
+    with open("data/cache", "w") as file:
+        file.writelines(lines)
+
     return "Accepted"
 
 @app.route('/config_version', methods=['GET'])
