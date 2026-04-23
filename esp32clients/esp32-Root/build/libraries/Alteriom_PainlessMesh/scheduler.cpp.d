@@ -1,6 +1,8 @@
-/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/build/libraries/Painless_Mesh/painlessMeshSTA.cpp.o: \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessMeshSTA.cpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/configuration.hpp \
+/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/build/libraries/Alteriom_PainlessMesh/scheduler.cpp.o: \
+ /home/aiden/Documents/Arduino/libraries/Alteriom_PainlessMesh/src/scheduler.cpp \
+ /home/aiden/Documents/Arduino/libraries/Alteriom_PainlessMesh/src/painlessTaskOptions.h \
+ /home/aiden/Documents/Arduino/libraries/TaskScheduler/src/TaskScheduler.h \
+ /home/aiden/Documents/Arduino/libraries/TaskScheduler/src/TaskSchedulerDeclarations.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Arduino.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/esp_arduino_version.h \
  /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h \
@@ -143,89 +145,4 @@
  /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/hal/cpu_hal.h \
  /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/hal/cpu_ll.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/io_pin_remap.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Arduino.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessTaskOptions.h \
- /home/aiden/Documents/Arduino/libraries/TaskScheduler/src/TaskSchedulerDeclarations.h \
- /home/aiden/Documents/Arduino/libraries/ArduinoJson/src/ArduinoJson.h \
- /home/aiden/Documents/Arduino/libraries/ArduinoJson/src/ArduinoJson.hpp \
- /home/aiden/Documents/Arduino/libraries/ArduinoJson/src/ArduinoJson/Configuration.hpp \
- /home/aiden/Documents/Arduino/libraries/Async_TCP/src/AsyncTCP.h \
- /home/aiden/Documents/Arduino/libraries/Async_TCP/src/AsyncTCPVersion.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/pbuf.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/err.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFi.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Print.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiType.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_wifi/include/esp_wifi_types.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_wifi/include/esp_private/esp_wifi_types_private.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/esp_interface.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_event/include/esp_event_base.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiSTA.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiGeneric.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_event/include/esp_event.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_event/include/esp_event_base.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_wifi/include/esp_smartconfig.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_netif/include/esp_netif_types.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_netif/include/esp_netif_ip_addr.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_eth/include/esp_eth_driver.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_eth/include/esp_eth_com.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/hal/include/hal/eth_types.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_eth/include/esp_eth_spec.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_eth/include/esp_eth_mac.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/driver/spi/include/driver/spi_master.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/hal/include/hal/spi_types.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/driver/spi/include/driver/spi_common.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_system/include/esp_ipc.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/intr_types.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_eth/include/esp_eth_phy.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/espressif__network_provisioning/include/network_provisioning/manager.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/protocomm/include/common/protocomm.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/protocomm/include/security/protocomm_security.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/espressif__network_provisioning/include/network_provisioning/network_config.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/Network.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkInterface.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Printable.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkEvents.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkManager.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/WString.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkClient.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Client.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkServer.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Server.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkUdp.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Udp.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/cbuf.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_ringbuf/include/freertos/ringbuf.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiAP.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiScan.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiClient.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiServer.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/WiFi/src/WiFiUdp.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Network/src/NetworkUdp.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/esp_mac.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/arduino/wifi.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/configuration.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/logger.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessMeshSTA.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/mesh.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/connection.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/buffer.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/ntp.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/callback.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/protocol.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/router.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/layout.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/plugin.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/tcp.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/ota.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/base64.hpp \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/Update/src/Update.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/MD5Builder.h \
- /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_rom/include/esp_rom_md5.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/HashBuilder.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/HEXBuilder.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/SPIFFS/src/SPIFFS.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/FS/src/FS.h \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/mesh.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/layout.hpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessmesh/tcp.hpp
+ /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Arduino.h

@@ -37,7 +37,7 @@ toAdd=[]
 
 # Destroy the existing node database and cache
 #open('nodes.csv', 'w').close()
-open('data/cache', 'w').close()
+# open('data/cache', 'w').close()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -128,12 +128,12 @@ def ping():
     updated = False
     for i, line in enumerate(lines):
         if line.split(' ', 1)[0] == id:
-            lines[i] = f"{id} {timestamp}\n"
+            lines[i] = f"{id} {ssid} {strength} {timestamp}\n"
             updated = True
             break
 
     if not updated:
-        lines.append(f"{id} {timestamp}\n")
+        lines.append(f"{id} {ssid} {strength} {timestamp}\n")
 
     with open("data/cache", "w") as file:
         file.writelines(lines)

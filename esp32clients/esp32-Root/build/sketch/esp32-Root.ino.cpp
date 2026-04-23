@@ -10,16 +10,107 @@
 #define MESH_PASSWORD   "GoBlugolds"
 #define ROUTER_SSID     "Aiden-iPhone"
 #define ROUTER_PASSWORD "aidenleee"
+#define MESH_PORT       5555
+#define MESH_CHANNEL    6
+String HOSTNAME="https://kiwibots.myputer.org";
+String PATH="";
 
 Scheduler userScheduler;
 painlessMesh mesh;
 unsigned long lastHeartbeatMs = 0;
-const unsigned long heartbeatIntervalMs = 5000;
+const unsigned long heartbeatIntervalMs = 1000;
+
+const char* ssidPattern = "Aiden*";  // regex for SSIDs
+const unsigned long scanIntervalMs = 3000;
+const unsigned long updateIntervalMs = 30000;
 
 void receivedCallback(uint32_t from, String& msg);
 void newConnectionCallback(uint32_t nodeId);
 void changedConnectionCallback();
 void printConnections();
+
+JsonDocument config;
+static constexpr unsigned long HTTP_TIMEOUT_MS = 5000;
+
+#line 33 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+static void configureHttpClient(HTTPClient& http);
+#line 37 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+void getConfig();
+#line 69 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+void broadcastConfig(const char* ssidPattern, unsigned long scanIntervalMs);
+#line 96 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+void setup();
+#line 139 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+void loop();
+#line 207 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+static String trimCopy(String s);
+#line 212 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+static void stripQuotes(String& s);
+#line 219 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+bool tomlToJsonMinimal(const String& toml, String& outJson, String& outErr);
+#line 33 "/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/esp32-Root.ino"
+static void configureHttpClient(HTTPClient& http) {
+  http.setTimeout(HTTP_TIMEOUT_MS);
+}
+
+void getConfig() {
+    // Implement HTTP POST to cloud service here
+    HTTPClient http;
+  configureHttpClient(http);
+    http.begin(HOSTNAME + PATH + "/config"); //HTTP
+    int httpCode = http.GET();
+
+    // httpCode will be negative on error
+    if(httpCode > 0) {
+        // file found at server
+        if(httpCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            String jsonPayload, err;
+            if (tomlToJsonMinimal(payload, jsonPayload, err)) {
+                mesh.sendBroadcast(jsonPayload);
+                Serial.println(jsonPayload);
+            } else {
+                Serial.println(err);
+            }
+            deserializeJson(config, payload);
+            Serial.println(payload);
+        } else {
+        // HTTP header has been sent and Server response header has been handled
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+        }
+    } else {
+        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+
+    http.end();
+}
+
+void broadcastConfig(const char* ssidPattern, unsigned long scanIntervalMs) {
+    JsonDocument doc;
+    doc["type"] = "config_update";
+    JsonObject cfg = doc["config"].to<JsonObject>();
+    if (strlen(ssidPattern) > 0) {
+        cfg["ssidPattern"] = ssidPattern;
+    }
+    cfg["scanIntervalMs"] = scanIntervalMs;
+
+    String payload;
+    serializeJson(doc, payload);
+    
+    // mesh.sendBroadcast(payload);
+}
+
+Task updateConfig(30000, TASK_FOREVER, [](){
+    // Periodically fetch config from cloud service
+    Serial.println("Fetching config from cloud...");
+    getConfig();
+    String payload;
+
+    // serializeJson(config, payload);
+    // mesh.sendBroadcast(payload);
+});
+
+
 
 void setup() {
     Serial.begin(115200);
@@ -27,36 +118,39 @@ void setup() {
     
     Serial.println("\n\nStarting bridge initialization...");
 
-        WiFi.mode(WIFI_STA);
-        WiFi.begin(ROUTER_SSID, ROUTER_PASSWORD);
+        // WiFi.mode(WIFI_STA);
+        // WiFi.begin(ROUTER_SSID, ROUTER_PASSWORD);
 
-        uint8_t routerChannel = 1;
-        unsigned long startMs = millis();
-        while (WiFi.status() != WL_CONNECTED && (millis() - startMs) < 10000) {
-            delay(200);
-            Serial.print(".");
-        }
+        // uint8_t routerChannel = MESH_CHANNEL;
+        // unsigned long startMs = millis();
+        // while (WiFi.status() != WL_CONNECTED && (millis() - startMs) < 10000) {
+        //     delay(200);
+        //     Serial.print(".");
+        // }
 
-        if (WiFi.status() == WL_CONNECTED) {
-            routerChannel = WiFi.channel();
-            Serial.printf("\nRouter connected, channel=%u, ip=%s\n", routerChannel,
-                                        WiFi.localIP().toString().c_str());
-            WiFi.disconnect();
-            delay(200);
-        } else {
-            Serial.println("\nRouter connect timeout, defaulting mesh channel to 1");
-        }
-    
+        // if (WiFi.status() == WL_CONNECTED) {
+        //     routerChannel = WiFi.channel();
+        //     Serial.printf("\nRouter connected, channel=%u, ip=%s\n", routerChannel,
+        //                                 WiFi.localIP().toString().c_str());
+        //     WiFi.disconnect();
+        //     delay(200);
+        // } else {
+        //     Serial.println("\nRouter connect timeout, defaulting mesh channel to 1");
+        // }
+    uint8_t routerChannel = MESH_CHANNEL;
     mesh.setDebugMsgTypes(ERROR | STARTUP | CONNECTION);
     mesh.onReceive(&receivedCallback);
     mesh.onNewConnection(&newConnectionCallback);
     mesh.onChangedConnections(&changedConnectionCallback);
     
-        mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, 5555, WIFI_AP_STA,
+        mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT, WIFI_AP_STA,
                             routerChannel);
         mesh.stationManual(ROUTER_SSID, ROUTER_PASSWORD, 0);
         mesh.setRoot(true);
         mesh.setContainsRoot(true);
+
+    userScheduler.addTask(updateConfig);
+    updateConfig.enable();
     
     Serial.println("Bridge setup complete!");
 }
@@ -68,9 +162,9 @@ void loop() {
         lastHeartbeatMs = millis();
         SimpleList<uint32_t> nodes = mesh.getNodeList();
         Serial.printf("[HB] root=%u nodes=%u freeHeap=%u\n",
-                      mesh.getNodeId(),
-                      nodes.size(),
-                      ESP.getFreeHeap());
+                    mesh.getNodeId(),
+                    nodes.size(),
+                    ESP.getFreeHeap());
     }
 }
 
@@ -78,6 +172,28 @@ void loop() {
 void receivedCallback(uint32_t from, String& msg) {
   // Forward mesh data to Internet services (MQTT, HTTP, etc.)
     Serial.printf("Received from %u: %s\n", from, msg.c_str());
+
+    // Parse incoming JSON message
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, msg);
+    if (err) {
+        Serial.printf("JSON parse error: %s\n", err.c_str());
+        return;
+    }
+    if (doc.containsKey("node_id") || doc.containsKey("id")) {
+        // Forwards to server
+        HTTPClient http;
+      configureHttpClient(http);
+        http.begin(HOSTNAME + PATH + "/ping"); //HTTP
+        http.addHeader("Content-Type", "application/json");
+        int httpCode = http.POST(msg);
+        if(httpCode > 0) {
+            Serial.printf("[HTTP] POST... code: %d\n", httpCode);
+        } else {
+            Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+        http.end();
+    }
 }
 
 void newConnectionCallback(uint32_t nodeId) {
@@ -103,4 +219,91 @@ void printConnections() {
         first = false;
     }
     Serial.println();
+}
+
+#include <ArduinoJson.h>
+
+static String trimCopy(String s) {
+  s.trim();
+  return s;
+}
+
+static void stripQuotes(String& s) {
+  s = trimCopy(s);
+  if (s.length() >= 2 && s[0] == '"' && s[s.length() - 1] == '"') {
+    s = s.substring(1, s.length() - 1);
+  }
+}
+
+bool tomlToJsonMinimal(const String& toml, String& outJson, String& outErr) {
+  String ssidPattern = "";
+  unsigned long configUpdateMs = 0;
+  unsigned long scanIntervalMs = 0;
+
+  bool havePattern = false;
+  bool haveConfigUpdateMs = false;
+  bool haveScanIntervalMs = false;
+
+  int i = 0;
+  while (i < toml.length()) {
+    int nl = toml.indexOf('\n', i);
+    if (nl < 0) nl = toml.length();
+    String line = toml.substring(i, nl);
+    i = nl + 1;
+
+    line.trim();
+    if (line.length() == 0) continue;
+    if (line.startsWith("#")) continue;
+
+    int hashPos = line.indexOf('#');
+    if (hashPos >= 0) {
+      line = line.substring(0, hashPos);
+      line.trim();
+      if (line.length() == 0) continue;
+    }
+
+    int eq = line.indexOf('=');
+    if (eq < 0) continue;
+
+    String key = line.substring(0, eq);
+    String val = line.substring(eq + 1);
+    key.trim();
+    val.trim();
+
+    if (key == "target_address") {
+      stripQuotes(val);
+      ssidPattern = val;
+      havePattern = true;
+    } else if (key == "config_update_ms") {
+      configUpdateMs = (unsigned long)val.toInt();
+      haveConfigUpdateMs = true;
+    } else if (key == "scan_interval_ms") {
+      scanIntervalMs = (unsigned long)val.toInt();
+      haveScanIntervalMs = true;
+    }
+  }
+
+  if (!havePattern || ssidPattern.length() == 0 || ssidPattern.length() >= 64) {
+    outErr = "target_address missing or invalid";
+    return false;
+  }
+  if (!haveConfigUpdateMs || configUpdateMs < 1000 || configUpdateMs > 3600000) {
+    outErr = "config_update_ms missing or out of range";
+    return false;
+  }
+  if (!haveScanIntervalMs || scanIntervalMs < 1000 || scanIntervalMs > 60000) {
+    outErr = "scan_interval_ms missing or out of range";
+    return false;
+  }
+
+  JsonDocument doc;
+  doc["type"] = "config_update";
+  JsonObject cfg = doc["config"].to<JsonObject>();
+  cfg["target_address"] = ssidPattern;
+  cfg["config_update_ms"] = configUpdateMs;
+  cfg["scan_interval_ms"] = scanIntervalMs;
+
+  outJson = "";
+  serializeJson(doc, outJson);
+  return true;
 }

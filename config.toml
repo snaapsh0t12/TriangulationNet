@@ -1,4 +1,4 @@
-target_address = 'wwwesrty'
+target_address = 'Aiden*'
 config_update_ms = 30000
-scan_interval_ms = 10
+scan_interval_ms = 10000
 clock_delay = 10

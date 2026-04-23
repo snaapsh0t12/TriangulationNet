@@ -28,10 +28,16 @@ void changedConnectionCallback();
 void printConnections();
 
 JsonDocument config;
+static constexpr unsigned long HTTP_TIMEOUT_MS = 5000;
+
+static void configureHttpClient(HTTPClient& http) {
+  http.setTimeout(HTTP_TIMEOUT_MS);
+}
 
 void getConfig() {
     // Implement HTTP POST to cloud service here
     HTTPClient http;
+  configureHttpClient(http);
     http.begin(HOSTNAME + PATH + "/config"); //HTTP
     int httpCode = http.GET();
 
@@ -147,6 +153,28 @@ void loop() {
 void receivedCallback(uint32_t from, String& msg) {
   // Forward mesh data to Internet services (MQTT, HTTP, etc.)
     Serial.printf("Received from %u: %s\n", from, msg.c_str());
+
+    // Parse incoming JSON message
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, msg);
+    if (err) {
+        Serial.printf("JSON parse error: %s\n", err.c_str());
+        return;
+    }
+    if (doc.containsKey("node_id") || doc.containsKey("id")) {
+        // Forwards to server
+        HTTPClient http;
+      configureHttpClient(http);
+        http.begin(HOSTNAME + PATH + "/ping"); //HTTP
+        http.addHeader("Content-Type", "application/json");
+        int httpCode = http.POST(msg);
+        if(httpCode > 0) {
+            Serial.printf("[HTTP] POST... code: %d\n", httpCode);
+        } else {
+            Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+        http.end();
+    }
 }
 
 void newConnectionCallback(uint32_t nodeId) {
@@ -223,7 +251,7 @@ bool tomlToJsonMinimal(const String& toml, String& outJson, String& outErr) {
     key.trim();
     val.trim();
 
-    if (key == "ssid_pattern") {
+    if (key == "target_address") {
       stripQuotes(val);
       ssidPattern = val;
       havePattern = true;
@@ -237,7 +265,7 @@ bool tomlToJsonMinimal(const String& toml, String& outJson, String& outErr) {
   }
 
   if (!havePattern || ssidPattern.length() == 0 || ssidPattern.length() >= 64) {
-    outErr = "ssid_pattern missing or invalid";
+    outErr = "target_address missing or invalid";
     return false;
   }
   if (!haveConfigUpdateMs || configUpdateMs < 1000 || configUpdateMs > 3600000) {
@@ -252,7 +280,7 @@ bool tomlToJsonMinimal(const String& toml, String& outJson, String& outErr) {
   JsonDocument doc;
   doc["type"] = "config_update";
   JsonObject cfg = doc["config"].to<JsonObject>();
-  cfg["ssid_pattern"] = ssidPattern;
+  cfg["target_address"] = ssidPattern;
   cfg["config_update_ms"] = configUpdateMs;
   cfg["scan_interval_ms"] = scanIntervalMs;
 

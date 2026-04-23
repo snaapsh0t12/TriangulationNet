@@ -1,8 +1,5 @@
-/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/build/libraries/Painless_Mesh/scheduler.cpp.o: \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/scheduler.cpp \
- /home/aiden/Documents/Arduino/libraries/Painless_Mesh/src/painlessTaskOptions.h \
- /home/aiden/Documents/Arduino/libraries/TaskScheduler/src/TaskScheduler.h \
- /home/aiden/Documents/Arduino/libraries/TaskScheduler/src/TaskSchedulerDeclarations.h \
+/home/aiden/Documents/GitHub/TriangulationNet/esp32clients/esp32-Root/build/libraries/NetworkClientSecure/ssl_client.cpp.o: \
+ /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/NetworkClientSecure/src/ssl_client.cpp \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Arduino.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/esp_arduino_version.h \
  /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h \
@@ -145,4 +142,115 @@
  /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/hal/cpu_hal.h \
  /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_hw_support/include/hal/cpu_ll.h \
  /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/io_pin_remap.h \
- /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Arduino.h
+ /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/Arduino.h \
+ /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/cores/esp32/esp32-hal-log.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/err.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/include/lwip/sockets.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/sockets.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/netif.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/pbuf.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/stats.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/mem.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/memp.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/priv/memp_std.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/priv/memp_priv.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/priv/mem_priv.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/inet.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/errno.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/sys.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/include/lwip/netdb.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/lwip/lwip/src/include/lwip/netdb.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/sha256.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/private_access.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/build_info.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/mbedtls/esp_config.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/mbedtls_config.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/esp_mem.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/config_psa.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_legacy.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_adjust_config_synonyms.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_adjust_config_dependencies.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/config_adjust_psa_superset_legacy.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/config_adjust_psa_from_legacy.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_adjust_config_key_pair_types.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_adjust_auto_enabled.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/config_adjust_legacy_crypto.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/config_adjust_x509.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/config_adjust_ssl.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/check_config.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/sha256_alt.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/hal/include/hal/sha_types.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_rom/include/esp32/rom/sha.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/oid.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/asn1.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/platform_util.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/mbedtls/bignum.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/bignum.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/pk.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/md.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/rsa.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/mbedtls/ecp.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ecp.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ecdsa.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_platform.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/build_info.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_types.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_values.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_sizes.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_struct.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_driver_contexts_primitives.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_driver_common.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_sizes.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_builtin_primitives.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/md5.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/md5_alt.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/md/esp_md.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_rom/include/esp_rom_md5.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ripemd160.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/sha1.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/sha1_alt.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/sha512.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/sha512_alt.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/sha3.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/cipher.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_driver_contexts_composites.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_builtin_composites.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/cmac.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/mbedtls/gcm.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/gcm.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/gcm_alt.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/aes/esp_aes_gcm.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/aes/esp_aes.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_common/include/esp_types.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/hal/include/hal/aes_types.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/soc/include/soc/lldesc.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/esp_rom/include/esp_rom_lldesc.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ccm.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/chachapoly.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/poly1305.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/chacha20.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ecjpake.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_driver_contexts_key_derivation.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_builtin_key_derivation.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_extra.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/psa/crypto_compat.h \
+ /home/aiden/.arduino15/packages/esp32/hardware/esp32/3.0.7/libraries/NetworkClientSecure/src/ssl_client.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/platform.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/platform_time.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/net_sockets.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ssl.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ssl_ciphersuites.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/x509_crt.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/x509.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/x509_crl.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ecdh.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/debug.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/entropy.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/md.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/aes.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/port/include/aes_alt.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/entropy.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/mbedtls/include/mbedtls/error.h \
+ /home/aiden/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-632e0c2a/esp32/include/mbedtls/esp_crt_bundle/include/esp_crt_bundle.h
