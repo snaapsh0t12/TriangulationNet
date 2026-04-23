@@ -1,0 +1,4 @@
+target_address = 'wwwesrty'
+config_update_ms = 30000
+scan_interval_ms = 10
+clock_delay = 10
